@@ -1,0 +1,2820 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#141318">
+    <title>Christian Jewelry</title>
+    <link rel="stylesheet" href="jav.css">
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="header">
+    <div class="header__inner">
+        <div class="logo" onclick="showPage('home')">Christian Jewelry</div>
+        <nav class="nav">
+            <a href="#" class="nav__link active" onclick="showPage('home');return false;">Головна</a>
+            <a href="#" class="nav__link" onclick="showPage('about');return false;">Про нас</a>
+            <a href="#" class="nav__link" onclick="showPage('contacts');return false;">Контакти</a>
+            <button class="nav__btn" onclick="openOrderModal()">Замовлення</button>
+            <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn" title="Змінити тему" aria-label="Змінити тему">🌙</button>
+            <div id="authArea"></div>
+        </nav>
+    </div>
+</header>
+
+<!-- ===== ADMIN BAR ===== -->
+<div class="admin-bar" id="adminBar" style="display:none;">
+    <span>⚙ Адміністратор</span>
+    <button class="admin-btn" onclick="openAddProductModal()">+ Додати виріб</button>
+    <button class="admin-btn" onclick="openUsersModal()">👤 Облікові записи</button>
+    <button class="admin-btn" onclick="exportDB()">⬇ Експорт БД</button>
+    <button class="admin-btn" id="adminMsgBtn" onclick="openAdminMessagesModal()">💬 Повідомлення <span class="admin-msg-badge" id="adminMsgBadge" style="display:none">0</span></button>
+</div>
+
+<!-- ===== PAGE: HOME ===== -->
+<div class="page active" id="page-home">
+    <div class="wrapper">
+        <section class="categories">
+            <div class="categories__row">
+                <div class="category" onclick="showCategory('rings')">
+                    <div class="category__img"><img src="img/кільце.jpg" alt="Каблучки"></div>
+                    <span>Каблучки / Перстні</span>
+                </div>
+                <div class="category" onclick="showCategory('earrings')">
+                    <div class="category__img"><img src="img/сережки.jpg" alt="Сережки"></div>
+                    <span>Сережки</span>
+                </div>
+                <div class="category" onclick="showCategory('pendants')">
+                    <div class="category__img"><img src="img/підвіска.jpg" alt="Підвіски"></div>
+                    <span>Підвіски</span>
+                </div>
+                <div class="category" onclick="showCategory('bracelets')">
+                    <div class="category__img"><img src="img/браслет.jpg" alt="Браслети"></div>
+                    <span>Браслети</span>
+                </div>
+                <div class="category" onclick="showCategory('necklaces')">
+                    <div class="category__img"><img src="img/коль'є.jpg" alt="Коль'є"></div>
+                    <span>Коль'є</span>
+                </div>
+                <div class="category" onclick="showCategory('brooches')">
+                    <div class="category__img" style="background:linear-gradient(135deg,#1e1630,#2a1e40);display:flex;align-items:center;justify-content:center;">
+                        <svg width="64" height="64" viewBox="0 0 70 70" fill="none">
+                            <circle cx="35" cy="35" r="33" stroke="#9070d0" stroke-width="1.5" stroke-dasharray="5 3"/>
+                            <text x="35" y="42" text-anchor="middle" font-family="Poppins,sans-serif" font-size="26" fill="#9070d0">✿</text>
+                        </svg>
+                    </div>
+                    <span>Брошки</span>
+                </div>
+                <div class="category" onclick="showCategory('custom')">
+                    <div class="category__img" style="background:linear-gradient(135deg,#1c1828,#261e38);display:flex;align-items:center;justify-content:center;">
+                        <svg width="64" height="64" viewBox="0 0 70 70" fill="none">
+                            <circle cx="35" cy="35" r="33" stroke="#c8a850" stroke-width="1.5" stroke-dasharray="5 3"/>
+                            <text x="35" y="32" text-anchor="middle" font-family="Poppins,sans-serif" font-size="20" fill="#c8a850">✦</text>
+                            <text x="35" y="50" text-anchor="middle" font-family="Poppins,sans-serif" font-size="8" fill="#c8a850" font-weight="600" letter-spacing="1">YOUR IDEA</text>
+                        </svg>
+                    </div>
+                    <span>Індивідуальне</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- FILTER SECTION -->
+        <section class="filter-bar">
+            <div class="filter-group">
+                <label class="filter-label">Категорія</label>
+                <select class="filter-select" id="homeFilterCategory" onchange="applyHomeFilters()">
+                    <option value="">Усі категорії</option>
+                    <option value="rings">Каблучки / Перстні</option>
+                    <option value="earrings">Сережки</option>
+                    <option value="pendants">Підвіски</option>
+                    <option value="bracelets">Браслети</option>
+                    <option value="necklaces">Коль'є</option>
+                    <option value="brooches">Брошки</option>
+                    <option value="custom">Індивідуальне</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">Матеріал</label>
+                <select class="filter-select" id="homeFilterMaterial" onchange="applyHomeFilters()">
+                    <option value="">Усі матеріали</option>
+                </select>
+            </div>
+            <div class="filter-group filter-group--price">
+                <label class="filter-label">Ціна (грн)</label>
+                <div class="filter-price-row">
+                    <input class="filter-input" type="number" id="homeFilterPriceMin" placeholder="Від" min="0" oninput="applyHomeFilters()">
+                    <span class="filter-price-sep">—</span>
+                    <input class="filter-input" type="number" id="homeFilterPriceMax" placeholder="До" min="0" oninput="applyHomeFilters()">
+                </div>
+            </div>
+            <button class="filter-reset" onclick="resetHomeFilters()">✕ Скинути</button>
+            <div class="filter-count" id="homeFilterCount"></div>
+        </section>
+
+        <section class="home-catalog">
+            <div class="home-catalog__header">
+                <h2 class="home-catalog__title">Каталог виробів</h2>
+            </div>
+            <div class="home-catalog__grid" id="homeCatalogGrid"></div>
+        </section>
+    </div>
+</div>
+
+<!-- ===== PAGE: CATEGORY ===== -->
+<div class="page" id="page-category">
+    <div class="wrapper" style="min-height:80vh;">
+        <div class="page-header">
+            <h1 id="categoryTitle">Категорія</h1>
+        </div>
+
+        <!-- ── FILTER BAR ── -->
+        <div class="filter-bar" id="filterBar">
+            <div class="filter-group">
+                <label class="filter-label">Категорія</label>
+                <select class="filter-select" id="filterCategory" onchange="applyFilters()">
+                    <option value="">Усі категорії</option>
+                    <option value="rings">Каблучки / Перстні</option>
+                    <option value="earrings">Сережки</option>
+                    <option value="pendants">Підвіски</option>
+                    <option value="bracelets">Браслети</option>
+                    <option value="necklaces">Коль'є</option>
+                    <option value="brooches">Брошки</option>
+                    <option value="custom">Індивідуальне</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">Матеріал</label>
+                <select class="filter-select" id="filterMaterial" onchange="applyFilters()">
+                    <option value="">Усі матеріали</option>
+                </select>
+            </div>
+            <div class="filter-group filter-group--price">
+                <label class="filter-label">Ціна (грн)</label>
+                <div class="filter-price-row">
+                    <input class="filter-input" type="number" id="filterPriceMin" placeholder="Від" min="0" oninput="applyFilters()">
+                    <span class="filter-price-sep">—</span>
+                    <input class="filter-input" type="number" id="filterPriceMax" placeholder="До" min="0" oninput="applyFilters()">
+                </div>
+            </div>
+            <button class="filter-reset" onclick="resetFilters()">✕ Скинути</button>
+        </div>
+
+        <div class="filter-count" id="filterCount"></div>
+        <div class="products-grid" id="productsGrid"></div>
+    </div>
+</div>
+
+<!-- ===== PAGE: PROFILE ===== -->
+<div class="page" id="page-profile">
+    <div class="wrapper" style="min-height:80vh;padding-bottom:60px;">
+
+        <!-- Хедер профілю -->
+        <div class="profile-header">
+            <div class="profile-avatar">👤</div>
+            <div class="profile-meta">
+                <h2 id="profileName" class="profile-name">—</h2>
+                <p id="profileEmail" class="profile-email">—</p>
+                <p id="profilePhone" class="profile-phone">—</p>
+            </div>
+        </div>
+
+        <!-- Вкладки -->
+        <div class="profile-tabs">
+            <button class="profile-tab active" data-tab="orders"   onclick="switchProfileTab('orders')">📦 Мої замовлення</button>
+            <button class="profile-tab"         data-tab="wishlist" onclick="switchProfileTab('wishlist')">♡ Вибране</button>
+            <button class="profile-tab"         data-tab="history" onclick="switchProfileTab('history')">👁 Історія переглядів</button>
+            <button class="profile-tab"         data-tab="settings" onclick="switchProfileTab('settings')">⚙ Налаштування</button>
+        </div>
+
+        <!-- Вміст вкладки -->
+        <div id="profileContent" style="padding:0 40px;"></div>
+    </div>
+</div>
+
+<!-- ===== MODAL: EDIT ORDER ===== -->
+<div class="modal-overlay" id="editOrderModal">
+    <div class="modal order-modal">
+        <button class="modal__close" onclick="closeModal('editOrderModal')">✕</button>
+        <h2>Редагувати замовлення</h2>
+        <p>Зміни можливі лише для замовлень зі статусом «Нове»</p>
+        <div class="form-group">
+            <label>Виріб</label>
+            <select id="editOrderProduct">
+                <option>Каблучка / Перстень</option><option>Сережки</option>
+                <option>Підвіска</option><option>Браслет</option>
+                <option>Коль'є</option><option>Брошка</option>
+                <option>Індивідуальне замовлення</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Матеріал</label>
+            <select id="editOrderMaterial">
+                <option>Срібло 925</option><option>Золото 585</option>
+                <option>Золото 750</option><option>Позолочене срібло</option><option>Біле золото</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Стиль</label>
+            <select id="editOrderStyle">
+                <option>Класичний</option><option>Мінімалістичний</option>
+                <option>Вінтажний</option><option>Релігійний / Духовний</option><option>Авторський</option>
+            </select>
+        </div>
+        <div class="form-group"><label>Додаткові матеріали / камені</label>
+            <input type="text" id="editOrderExtras" placeholder="Діамант, смарагд, гравіювання...">
+        </div>
+        <div class="form-group"><label>Нотатки / побажання</label>
+            <textarea id="editOrderNotes" placeholder="Деталі замовлення..."></textarea>
+        </div>
+        <div class="form-error" id="editOrderError"></div>
+        <button class="form-submit" onclick="submitEditOrder()">✓ Зберегти зміни</button>
+    </div>
+</div>
+
+<!-- ===== PAGE: ABOUT ===== -->
+<div class="page" id="page-about">
+    <div class="wrapper">
+        <div class="static-page">
+            <h1>Про нас</h1>
+            <p>
+                Christian Jewelry — це авторська ювелірна майстерня, що створює вироби з душею та змістом.
+                Кожен виріб несе в собі символіку та естетику, що поєднує духовність і сучасний стиль.
+                Ми працюємо з сріблом, золотом і натуральними каменями, втілюючи унікальні ідеї в метал.
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- ===== PAGE: CONTACTS ===== -->
+<div class="page" id="page-contacts">
+    <div class="wrapper">
+        <div class="static-page" style="max-width:600px;">
+            <h1>Контакти</h1>
+            <p>
+                📞 Телефон: +38 (0XX) XXX-XX-XX<br><br>
+                📧 Email: info@christianjewelry.ua<br><br>
+                📍 Київ, Україна
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MODAL: AUTH ===== -->
+<div class="modal-overlay" id="authModal">
+    <div class="modal">
+        <button class="modal__close" onclick="closeModal('authModal')">✕</button>
+        <h2 id="authTitle">Увійти</h2>
+        <p id="authSubtitle">Введіть свої дані для входу</p>
+        <div class="form-tabs">
+            <div class="form-tab active" id="tabLogin" onclick="switchTab('login')">Вхід</div>
+            <div class="form-tab" id="tabRegister" onclick="switchTab('register')">Реєстрація</div>
+        </div>
+        <div id="loginForm">
+            <div class="form-group"><label>Електронна пошта</label><input type="email" id="loginEmail" placeholder="your@email.com"></div>
+            <div class="form-group"><label>Пароль</label><input type="password" id="loginPassword" placeholder="••••••••"></div>
+            <button class="form-submit" onclick="doLogin()">Увійти</button>
+            <div class="form-error" id="loginError">Невірний email або пароль</div>
+        </div>
+        <div id="registerForm" style="display:none;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div class="form-group"><label>Ім'я</label><input type="text" id="regName" placeholder="Ім'я"></div>
+                <div class="form-group"><label>Прізвище</label><input type="text" id="regSurname" placeholder="Прізвище"></div>
+            </div>
+            <div class="form-group"><label>Номер телефону</label><input type="tel" id="regPhone" placeholder="+38 (0XX) XXX-XX-XX"></div>
+            <div class="form-group"><label>Електронна пошта</label><input type="email" id="regEmail" placeholder="your@email.com"></div>
+            <div class="form-group"><label>Пароль</label><input type="password" id="regPassword" placeholder="Мінімум 6 символів"></div>
+            <button class="form-submit" onclick="doRegister()">Зареєструватись</button>
+            <div class="form-error" id="registerError"></div>
+            <div class="form-success" id="registerSuccess">✓ Реєстрацію успішно завершено!</div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MODAL: ORDER ===== -->
+<div class="modal-overlay" id="orderModal">
+    <div class="modal order-modal">
+        <button class="modal__close" onclick="closeModal('orderModal')">✕</button>
+        <h2>Оформити замовлення</h2>
+        <p>Заповніть деталі вашого виробу</p>
+        <div class="form-group">
+            <label>Виріб</label>
+            <select id="orderProduct">
+                <option value="">— Оберіть тип виробу —</option>
+                <option>Каблучка / Перстень</option><option>Сережки</option>
+                <option>Підвіска</option><option>Браслет</option>
+                <option>Коль'є</option><option>Брошка</option>
+                <option>Індивідуальне замовлення</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Матеріал</label>
+            <select id="orderMaterial">
+                <option value="">— Оберіть матеріал —</option>
+                <option>Срібло 925</option><option>Золото 585</option>
+                <option>Золото 750</option><option>Позолочене срібло</option><option>Біле золото</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Стиль</label>
+            <select id="orderStyle">
+                <option value="">— Оберіть стиль —</option>
+                <option>Класичний</option><option>Мінімалістичний</option>
+                <option>Вінтажний</option><option>Релігійний / Духовний</option><option>Авторський</option>
+            </select>
+        </div>
+        <div class="form-group"><label>Додаткові матеріали / камені</label>
+            <input type="text" id="orderExtras" placeholder="Наприклад: діамант, смарагд, гравіювання...">
+        </div>
+        <div class="form-group"><label>Нотатки / побажання</label>
+            <textarea id="orderNotes" placeholder="Опишіть деталі замовлення, розміри, побажання..."></textarea>
+        </div>
+        <div class="form-group">
+            <label>Фото-зразок</label>
+            <div class="file-upload">
+                <input type="file" id="orderFiles" accept="image/*" multiple onchange="previewFiles(this)">
+                <div class="file-upload-label">📎 Натисніть або перетягніть фото-зразки сюди</div>
+                <div class="file-preview" id="orderFilesPreview"></div>
+            </div>
+        </div>
+        <button class="form-submit" onclick="submitOrder()">✦ Здійснити замовлення</button>
+        <div class="form-success" id="orderSuccess">✓ Ваше замовлення прийнято! Ми зв'яжемось з вами найближчим часом.</div>
+    </div>
+</div>
+
+<!-- ===== MODAL: ADD/EDIT PRODUCT (ADMIN) ===== -->
+<div class="modal-overlay" id="addProductModal">
+    <div class="modal" style="max-width:580px;">
+        <button class="modal__close" onclick="closeModal('addProductModal')">✕</button>
+        <h2 id="addProductTitle">Додати виріб</h2>
+        <p>Заповніть інформацію про виріб</p>
+        <input type="hidden" id="editProductId">
+        <div class="form-group">
+            <label>Категорія</label>
+            <select id="addCat">
+                <option value="rings">Каблучки / Перстні</option>
+                <option value="earrings">Сережки</option>
+                <option value="pendants">Підвіски</option>
+                <option value="bracelets">Браслети</option>
+                <option value="necklaces">Коль'є</option>
+                <option value="brooches">Брошки</option>
+                <option value="custom">Індивідуальне</option>
+            </select>
+        </div>
+        <div class="form-group"><label>Назва виробу</label>
+            <input type="text" id="addName" placeholder="Наприклад: Хрест «Солус Христус»">
+        </div>
+        <div class="form-group"><label>Опис</label>
+            <textarea id="addDesc" placeholder="Короткий опис виробу..."></textarea>
+        </div>
+        <div class="form-group"><label>Матеріал</label>
+            <input type="text" id="addMaterial" placeholder="Срібло 925, Золото 585...">
+        </div>
+        <div class="form-group"><label>Ціна (грн)</label>
+            <input type="number" id="addPrice" placeholder="0">
+        </div>
+        <div class="form-group">
+            <label>Фото та відео виробу</label>
+            <div class="media-upload-zone" id="mediaUploadZone" onclick="document.getElementById('mediaFileInput').click()">
+                <input type="file" id="mediaFileInput" accept="image/*,video/*" multiple style="display:none" onchange="handleMediaFiles(this)">
+                <div class="media-upload-hint">
+                    <span style="font-size:24px;">📎</span>
+                    <p>Натисніть щоб обрати фото або відео</p>
+                    <p style="font-size:11px;opacity:.5;">JPG, PNG, WebP, MP4, MOV — можна кілька одразу</p>
+                </div>
+            </div>
+            <div style="margin-top:8px;display:flex;gap:8px;">
+                <input type="text" id="addMediaUrl" placeholder="Або вставте URL фото/відео..." class="media-url-input">
+                <button type="button" onclick="addMediaUrl()" class="media-url-btn">+ Додати</button>
+            </div>
+            <div class="media-preview-list" id="mediaPreviewList"></div>
+        </div>
+        <button class="form-submit" id="saveProductBtn" onclick="adminSaveProduct()">+ Зберегти виріб</button>
+    </div>
+</div>
+
+<!-- ===== MODAL: USERS (ADMIN) ===== -->
+<div class="modal-overlay" id="usersModal">
+    <div class="modal wide">
+        <button class="modal__close" onclick="closeModal('usersModal')">✕</button>
+        <h2>Облікові записи</h2>
+        <p>Зареєстровані користувачі та замовлення</p>
+        <div id="usersTableWrap"></div>
+    </div>
+</div>
+
+<!-- ===== MODAL: ADMIN MESSAGES ===== -->
+<div class="modal-overlay" id="adminMsgModal">
+    <div class="modal wide">
+        <button class="modal__close" onclick="closeModal('adminMsgModal')">✕</button>
+        <h2>💬 Повідомлення від користувачів</h2>
+        <p>Оберіть користувача щоб переглянути переписку та відповісти</p>
+        <div id="adminMsgWrap"></div>
+    </div>
+</div>
+
+<!-- ===== MODAL: LIGHTBOX ===== -->
+<div class="modal-overlay" id="lightboxModal" style="background:rgba(4,3,14,0.95);padding:0;">
+    <div class="lightbox">
+        <button class="lightbox__close" onclick="closeLightbox()">✕</button>
+        <button class="lightbox__nav lightbox__nav--prev" onclick="lightboxNav(-1)">&#8249;</button>
+        <div class="lightbox__media" id="lightboxMedia"></div>
+        <button class="lightbox__nav lightbox__nav--next" onclick="lightboxNav(1)">&#8250;</button>
+        <div class="lightbox__counter" id="lightboxCounter"></div>
+        <div class="lightbox__thumbs" id="lightboxThumbs"></div>
+        <!-- ── REVIEWS SECTION ── -->
+        <div class="lb-reviews" id="lbReviews"></div>
+    </div>
+</div>
+
+<!-- ===== CHAT FAB (floating button for users) ===== -->
+<button class="chat-fab" id="chatFab" onclick="openChatModal()" style="display:none;" title="Написати адміністратору" aria-label="Чат з адміністратором">
+    💬
+    <span class="chat-fab__badge" id="chatFabBadge" style="display:none"></span>
+</button>
+
+<!-- ===== MODAL: USER CHAT ===== -->
+<div class="modal-overlay" id="chatModal">
+    <div class="modal chat-modal">
+        <button class="modal__close" onclick="closeModal('chatModal')">✕</button>
+        <h2>💬 Написати адміністратору</h2>
+        <p>Ми відповімо якнайшвидше</p>
+        <div class="chat-messages" id="chatMessages">
+            <div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">Завантаження...</div>
+        </div>
+        <div class="chat-input-row">
+            <input class="chat-input" type="text" id="chatInput" placeholder="Напишіть повідомлення..." onkeydown="if(event.key==='Enter')sendChatMessage()">
+            <button class="chat-send" onclick="sendChatMessage()">Надіслати</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+    <div class="footer__inner">
+        <div class="footer__brand">
+            <div class="footer__logo">Christian Jewelry</div>
+            <p class="footer__tagline">Вироби з душею та змістом</p>
+        </div>
+        <div class="footer__social">
+            <p class="footer__label">Ми в соціальних мережах</p>
+            <div class="footer__links">
+                <a href="https://www.instagram.com/" target="_blank" class="footer__social-btn footer__social-btn--ig">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                    Instagram
+                </a>
+                <a href="https://www.tiktok.com/" target="_blank" class="footer__social-btn footer__social-btn--tt">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/></svg>
+                    TikTok
+                </a>
+            </div>
+        </div>
+        <div class="footer__army">
+            <p class="footer__label">🇺🇦 Підтримати захисників</p>
+            <p class="footer__army-text">Частина коштів від замовлень спрямовується на підтримку ЗСУ</p>
+            <div class="footer__army-btns">
+                <a href="https://savelife.in.ua/donate/" target="_blank" class="footer__army-btn">Повернись живим</a>
+                <a href="https://prytula.org/donate" target="_blank" class="footer__army-btn footer__army-btn--alt">Фонд Притули</a>
+            </div>
+        </div>
+    </div>
+    <div class="footer__bottom">
+        <span>© 2026 Christian Jewelry. Всі права захищені.</span>
+        <span>Зроблено з ❤️ в Україні</span>
+    </div>
+</footer>
+
+<div class="notif" id="notif"></div>
+<script src="jav.js"></script>
+</body>
+</html>
+
+/* ============================================================
+   CHRISTIAN JEWELRY — CSS v6
+   Теми: dark (default) / light
+   Перемикач: data-theme на <html>
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* ── CSS змінні — темна тема (default) ── */
+:root {
+    --bg-page:        #141318;
+    --bg-surface:     #1c1a24;
+    --bg-card:        #201e2c;
+    --bg-card-hover:  #272434;
+    --bg-header:      rgba(14,13,20,0.97);
+    --bg-footer:      #0d0c14;
+    --bg-modal:       #1a1826;
+    --bg-input:       #12111c;
+    --bg-admin:       #0e0d16;
+
+    --text-primary:   #ede9f8;
+    --text-secondary: #b0a8cc;
+    --text-muted:     #6e6885;
+    --text-faint:     #3e3a52;
+
+    --accent:         #c8b8e8;
+    --accent-soft:    rgba(180,160,220,0.15);
+    --accent-border:  rgba(180,160,220,0.25);
+    --accent-glow:    rgba(180,150,230,0.12);
+
+    --pearl:          #d4cce8;
+    --pearl-dim:      rgba(200,185,230,0.55);
+
+    --gold:           #c8a850;
+    --gold-soft:      rgba(200,165,80,0.18);
+
+    --red:            #c85068;
+    --red-soft:       rgba(200,80,100,0.18);
+
+    --green:          #5cb88a;
+    --green-soft:     rgba(80,190,130,0.18);
+
+    --border:         rgba(180,160,220,0.12);
+    --border-hover:   rgba(180,160,220,0.35);
+
+    --shadow-card:    0 4px 24px rgba(0,0,0,0.5);
+    --shadow-hover:   0 8px 40px rgba(0,0,0,0.65), 0 0 0 1px rgba(180,160,220,0.18);
+    --shadow-modal:   0 24px 80px rgba(0,0,0,0.75);
+
+    --radius:         2px;
+    --transition:     0.22s ease;
+}
+
+/* ── Світла тема ── */
+[data-theme="light"] {
+    --bg-page:        #f4f2f8;
+    --bg-surface:     #ffffff;
+    --bg-card:        #ffffff;
+    --bg-card-hover:  #f8f6fc;
+    --bg-header:      rgba(255,255,255,0.97);
+    --bg-footer:      #1c1a28;
+    --bg-modal:       #ffffff;
+    --bg-input:       #f8f6fc;
+    --bg-admin:       #2a2838;
+
+    --text-primary:   #1a1828;
+    --text-secondary: #3e3858;
+    --text-muted:     #7068a0;
+    --text-faint:     #b8b0d0;
+
+    --accent:         #7060c0;
+    --accent-soft:    rgba(112,96,192,0.08);
+    --accent-border:  rgba(112,96,192,0.25);
+    --accent-glow:    rgba(112,96,192,0.08);
+
+    --pearl:          #4a3c88;
+    --pearl-dim:      rgba(100,80,180,0.7);
+
+    --gold:           #8a6800;
+    --gold-soft:      rgba(180,130,0,0.1);
+
+    --red:            #c0203c;
+    --red-soft:       rgba(192,32,60,0.1);
+
+    --green:          #1a8050;
+    --green-soft:     rgba(26,128,80,0.1);
+
+    --border:         rgba(100,80,180,0.12);
+    --border-hover:   rgba(100,80,180,0.3);
+
+    --shadow-card:    0 2px 12px rgba(60,40,120,0.07);
+    --shadow-hover:   0 6px 28px rgba(60,40,120,0.14), 0 0 0 1px rgba(100,80,180,0.12);
+    --shadow-modal:   0 16px 60px rgba(40,30,80,0.18);
+}
+
+/* ── Reset ── */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+    font-family:'Poppins',sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    color: var(--text-primary);
+    background: var(--bg-page);
+    width:100%;
+    overflow-x:hidden;
+    transition: background var(--transition), color var(--transition);
+}
+a { text-decoration:none; color:inherit; }
+img { display:block; max-width:100%; }
+button { font-family:inherit; }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width:6px; }
+::-webkit-scrollbar-track { background: var(--bg-page); }
+::-webkit-scrollbar-thumb { background: var(--accent-border); border-radius:3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* ══════════════════════════════════════════
+   WRAPPER
+══════════════════════════════════════════ */
+.wrapper {
+    width:100%;
+    min-height:100vh;
+    background: var(--bg-page);
+}
+
+/* ══════════════════════════════════════════
+   HEADER
+══════════════════════════════════════════ */
+.header {
+    background: var(--bg-header);
+    border-bottom: 1px solid var(--border);
+    width:100%;
+    position:sticky;
+    top:0;
+    z-index:200;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    transition: background var(--transition);
+}
+.header__inner {
+    width:100%;
+    max-width:1600px;
+    margin:0 auto;
+    padding:16px 40px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+}
+.logo {
+    font-size:18px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:2.5px;
+    cursor:pointer;
+    color: var(--text-primary);
+    white-space:nowrap;
+    flex-shrink:0;
+}
+.nav {
+    display:flex;
+    align-items:center;
+    gap:20px;
+    flex-wrap:wrap;
+}
+.nav__link {
+    color: var(--text-secondary);
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:.6px;
+    transition: color var(--transition);
+    white-space:nowrap;
+}
+.nav__link:hover { color: var(--text-primary); }
+.nav__link.active { font-weight:600; color: var(--text-primary); text-decoration:underline; text-decoration-color: var(--accent-border); }
+
+.nav__btn {
+    padding:9px 18px;
+    border:1.5px solid var(--accent-border);
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    transition: all var(--transition);
+    cursor:pointer;
+    background: var(--accent-soft);
+    color: var(--text-secondary);
+    white-space:nowrap;
+}
+.nav__btn:hover { background: var(--accent-border); color: var(--text-primary); border-color: var(--accent); }
+
+.theme-toggle {
+    width:38px; height:38px;
+    border:1.5px solid var(--accent-border);
+    background: var(--accent-soft);
+    color: var(--text-secondary);
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    font-size:17px;
+    transition: all var(--transition);
+    flex-shrink:0;
+}
+.theme-toggle:hover { background: var(--accent-border); color: var(--text-primary); }
+
+.user-badge {
+    display:flex; align-items:center; gap:8px;
+    font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.3px;
+    background: var(--accent-soft);
+    border:1px solid var(--accent-border);
+    color: var(--text-secondary);
+    padding:8px 14px;
+    cursor:pointer;
+    transition: all var(--transition);
+    white-space:nowrap;
+}
+.user-badge:hover { background: var(--accent-border); color: var(--text-primary); }
+.role-tag {
+    font-size:9px; background: var(--accent-border); color: var(--accent);
+    padding:2px 6px; font-weight:700; letter-spacing:.5px; text-transform:uppercase;
+}
+.role-tag.admin { background: var(--red-soft); color: var(--red); }
+
+/* ══════════════════════════════════════════
+   ADMIN BAR
+══════════════════════════════════════════ */
+.admin-bar {
+    background: var(--bg-admin);
+    border-bottom:1px solid var(--border);
+    padding:10px 40px;
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+}
+.admin-bar > span {
+    font-size:11px; text-transform:uppercase; letter-spacing:1px;
+    color: var(--text-muted); margin-right:4px;
+}
+.admin-btn {
+    padding:6px 14px;
+    border:1px solid var(--accent-border);
+    background: var(--accent-soft);
+    color: var(--text-secondary);
+    font-size:11px; text-transform:uppercase; letter-spacing:.5px;
+    cursor:pointer; transition: all var(--transition);
+    position:relative;
+}
+.admin-btn:hover { background: var(--accent-border); color: var(--text-primary); }
+.admin-msg-badge {
+    display:inline-flex; align-items:center; justify-content:center;
+    background: var(--red); color:#fff;
+    font-size:9px; font-weight:700;
+    width:16px; height:16px; border-radius:50%;
+    margin-left:5px; vertical-align:middle;
+}
+
+/* ══════════════════════════════════════════
+   CATEGORIES
+══════════════════════════════════════════ */
+.categories { width:100%; padding:48px 0 36px; }
+.categories__row {
+    width:100%;
+    display:flex; justify-content:space-around;
+    align-items:flex-start; flex-wrap:wrap;
+    gap:16px; padding:0 40px;
+}
+.category {
+    flex:1 1 120px; max-width:170px;
+    text-align:center; cursor:pointer;
+}
+.category__img {
+    width:140px; height:140px;
+    border-radius:50%; overflow:hidden;
+    margin:0 auto 12px;
+    border:1.5px solid var(--border);
+    background: var(--bg-surface);
+    transition: transform .3s, border-color .3s, box-shadow .3s;
+    display:flex; align-items:center; justify-content:center;
+}
+.category__img img { width:100%; height:100%; object-fit:cover; }
+.category:hover .category__img {
+    transform:scale(1.06);
+    border-color: var(--pearl-dim);
+    box-shadow: 0 0 24px var(--accent-glow), 0 4px 20px rgba(0,0,0,.35);
+}
+.category span {
+    font-size:11px; text-transform:uppercase;
+    letter-spacing:1px; font-weight:600;
+    color: var(--text-muted);
+    transition: color var(--transition);
+}
+.category:hover span { color: var(--text-secondary); }
+
+/* ══════════════════════════════════════════
+   HOME CATALOG
+══════════════════════════════════════════ */
+.home-catalog { width:100%; padding:0 0 60px; }
+.home-catalog__header {
+    padding:28px 40px 18px;
+    display:flex; align-items:center; justify-content:space-between;
+    border-top:1px solid var(--border);
+}
+.home-catalog__title {
+    font-size:20px; text-transform:uppercase; letter-spacing:3px;
+    font-weight:700; color: var(--text-primary);
+}
+.home-catalog__grid { display:grid; grid-template-columns:repeat(4,1fr); }
+.home-catalog__empty {
+    text-align:center; padding:80px 40px;
+    color: var(--text-muted); grid-column:1/-1;
+}
+.home-catalog__empty h3 {
+    font-size:17px; text-transform:uppercase; letter-spacing:1px;
+    margin-bottom:8px; color: var(--text-secondary);
+}
+.home-catalog__empty p { font-size:13px; }
+
+/* ══════════════════════════════════════════
+   PRODUCT CARD
+══════════════════════════════════════════ */
+.product-card {
+    background: var(--bg-card);
+    cursor:default;
+    transition: box-shadow var(--transition), background var(--transition);
+    position:relative;
+    border:1px solid var(--border);
+    border-top:none; border-left:none;
+}
+.product-card:hover {
+    box-shadow: var(--shadow-hover);
+    background: var(--bg-card-hover);
+    z-index:1;
+}
+.product-card__img {
+    aspect-ratio:1/1; overflow:hidden;
+    background: var(--bg-surface);
+    cursor:pointer;
+    position:relative;
+}
+.product-card__img img, .product-card__img video {
+    width:100%; height:100%; object-fit:cover;
+    transition: transform .45s;
+}
+.product-card:hover .product-card__img img,
+.product-card:hover .product-card__img video { transform:scale(1.06); }
+
+.product-card__cat-badge {
+    position:absolute; top:10px; left:10px;
+    background: rgba(10,8,18,0.78);
+    backdrop-filter:blur(6px);
+    color: var(--pearl-dim); font-size:9px;
+    padding:3px 9px; text-transform:uppercase; letter-spacing:.5px;
+    border:1px solid var(--accent-border);
+}
+.product-card__media-count {
+    position:absolute; bottom:10px; right:10px;
+    background: rgba(10,8,18,0.72);
+    color:rgba(220,210,240,0.85); font-size:10px;
+    padding:3px 9px; letter-spacing:.3px;
+    pointer-events:none;
+}
+
+/* ── Wishlist button ── */
+.product-card__wishlist {
+    position:absolute; top:10px; right:10px;
+    width:32px; height:32px;
+    background: rgba(10,8,18,0.72);
+    backdrop-filter:blur(6px);
+    border:1px solid rgba(200,80,100,0.25);
+    color: rgba(200,80,100,0.6);
+    font-size:16px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition: all var(--transition);
+    z-index:2; line-height:1;
+}
+.product-card__wishlist:hover,
+.product-card__wishlist.active {
+    background: rgba(200,80,100,0.2);
+    border-color: var(--red);
+    color: var(--red);
+    transform:scale(1.12);
+}
+.product-card__wishlist.active { color: var(--red); }
+
+.product-card__info { padding:16px; }
+.product-card__name {
+    font-size:13px; font-weight:700; text-transform:uppercase;
+    letter-spacing:.5px; margin-bottom:4px;
+    color: var(--text-primary);
+}
+.product-card__material {
+    font-size:10px; text-transform:uppercase; letter-spacing:.5px;
+    margin-bottom:4px; color: var(--text-muted);
+}
+.product-card__desc {
+    font-size:12px; line-height:1.55; margin-bottom:10px;
+    color: var(--text-secondary);
+}
+.product-card__price {
+    font-size:15px; font-weight:700;
+    color: var(--pearl);
+}
+.product-card__actions { display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
+
+/* Buttons */
+.btn-sm {
+    flex:1; min-width:70px; padding:7px 6px;
+    font-size:10px; text-transform:uppercase; letter-spacing:.4px;
+    border:1.5px solid var(--accent-border);
+    background: var(--accent-soft);
+    color: var(--text-secondary);
+    cursor:pointer; transition: all var(--transition);
+}
+.btn-sm:hover { background: var(--accent-border); color: var(--text-primary); }
+.btn-sm.warning { border-color: var(--gold-soft); color: var(--gold); background:transparent; }
+.btn-sm.warning:hover { background: var(--gold-soft); border-color: var(--gold); }
+.btn-sm.danger  { border-color: var(--red-soft); color: var(--red); background:transparent; }
+.btn-sm.danger:hover  { background: var(--red-soft); border-color: var(--red); }
+
+/* ══════════════════════════════════════════
+   PAGES
+══════════════════════════════════════════ */
+.page { display:none; }
+.page.active { display:block; }
+
+.page-header {
+    padding:36px 40px 16px;
+    display:flex; align-items:center; justify-content:space-between;
+}
+.page-header h1 {
+    font-size:24px; text-transform:uppercase; letter-spacing:3px;
+    color: var(--text-primary);
+}
+.products-grid { display:grid; grid-template-columns:repeat(4,1fr); padding-bottom:60px; }
+.empty-state {
+    text-align:center; padding:80px 40px;
+    color: var(--text-muted); grid-column:1/-1;
+}
+.empty-state h3 {
+    font-size:17px; text-transform:uppercase; margin-bottom:8px;
+    color: var(--text-secondary);
+}
+
+/* Static pages */
+.static-page {
+    min-height:80vh; padding:60px 40px; max-width:800px; margin:0 auto;
+}
+.static-page h1 {
+    font-size:28px; text-transform:uppercase; letter-spacing:2px;
+    margin-bottom:20px; color: var(--text-primary);
+}
+.static-page p { font-size:15px; line-height:1.85; color: var(--text-secondary); }
+
+/* ══════════════════════════════════════════
+   FILTER BAR
+══════════════════════════════════════════ */
+.filter-bar {
+    display:flex; align-items:flex-end; flex-wrap:wrap;
+    gap:16px; padding:28px 40px;
+    background: linear-gradient(135deg, rgba(200,168,80,0.08) 0%, transparent 100%);
+    border-bottom: 2px solid var(--accent, #c8a850);
+    margin: 30px 0;
+}
+.filter-group { display:flex; flex-direction:column; gap:8px; }
+.filter-label {
+    font-size:11px; text-transform:uppercase; letter-spacing:1.2px;
+    font-weight:700; color: var(--accent, #c8a850);
+}
+.filter-select,
+.filter-input {
+    padding:10px 12px;
+    border: 1px solid var(--border);
+    background: var(--bg-input);
+    color: var(--text-primary);
+    font-family:inherit; font-size:13px;
+    transition: all var(--transition);
+    min-width:160px;
+    -webkit-appearance:none;
+    border-radius: 4px;
+}
+.filter-select:hover,
+.filter-input:hover {
+    border-color: var(--accent, #c8a850);
+    background: var(--bg-secondary);
+}
+.filter-select:focus,
+.filter-input:focus { 
+    outline:none; 
+    border-color: var(--accent, #c8a850);
+    box-shadow: 0 0 0 2px rgba(200,168,80,0.15);
+}
+.filter-select option {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    padding: 8px;
+}
+.filter-select option:checked {
+    background: #2563eb;
+    color: #ffffff;
+}
+.filter-group--price .filter-price-row { display:flex; align-items:center; gap:8px; }
+.filter-group--price .filter-input { min-width:100px; }
+.filter-price-sep { color:var(--text-muted); font-size:13px; font-weight:600; }
+.filter-reset {
+    padding:10px 18px;
+    border: 1px solid var(--accent, #c8a850);
+    background: rgba(200,168,80,0.12);
+    color: var(--accent, #c8a850);
+    font-size:12px; text-transform:uppercase; letter-spacing:.6px;
+    cursor:pointer; transition:all var(--transition); align-self:flex-end;
+    border-radius: 4px;
+    font-weight: 600;
+}
+.filter-reset:hover { 
+    background: var(--accent, #c8a850);
+    color: var(--bg-primary);
+}
+.filter-count {
+    width: 100%;
+    padding:12px 0 0;
+    font-size:12px; color:var(--text-muted);
+    letter-spacing:.3px;
+    font-style: italic;
+}
+
+@media (max-width:768px) {
+    .filter-bar {
+        flex-direction: column;
+        gap: 12px;
+        padding: 20px 20px;
+    }
+    .filter-group--price { width: 100%; }
+    .filter-group--price .filter-price-row { width: 100%; }
+    .filter-reset { width: 100%; }
+}
+
+/* ══════════════════════════════════════════
+   MODAL
+══════════════════════════════════════════ */
+.modal-overlay {
+    display:none; position:fixed; inset:0;
+    background: rgba(5,4,14,0.72);
+    backdrop-filter:blur(10px);
+    z-index:1000; align-items:flex-start; justify-content:center;
+    overflow-y:auto; padding:24px 16px;
+}
+.modal-overlay.open { display:flex; }
+.modal {
+    background: var(--bg-modal);
+    border:1px solid var(--accent-border);
+    box-shadow: var(--shadow-modal);
+    width:100%; max-width:500px;
+    padding:36px; position:relative;
+    animation:fadeUp .22s ease; margin:auto;
+}
+.modal.wide { max-width:800px; }
+.modal.order-modal { max-width:580px; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(-14px)} to{opacity:1;transform:translateY(0)} }
+
+.modal__close {
+    position:absolute; top:14px; right:18px;
+    font-size:20px; cursor:pointer; background:none; border:none;
+    color: var(--text-muted); transition: color var(--transition);
+    line-height:1;
+}
+.modal__close:hover { color: var(--red); }
+.modal h2 {
+    font-size:18px; text-transform:uppercase; letter-spacing:2px;
+    margin-bottom:4px; color: var(--text-primary);
+}
+.modal > p { font-size:13px; color: var(--text-muted); margin-bottom:20px; }
+
+/* ══════════════════════════════════════════
+   FORMS
+══════════════════════════════════════════ */
+.form-group { margin-bottom:13px; }
+.form-group label {
+    display:block; font-size:10px; text-transform:uppercase;
+    letter-spacing:.6px; font-weight:600; margin-bottom:5px;
+    color: var(--text-muted);
+}
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width:100%; padding:10px 12px;
+    border:1.5px solid var(--border);
+    font-family:inherit; font-size:14px;
+    background: var(--bg-input);
+    color: var(--text-primary);
+    transition: border-color var(--transition), background var(--transition);
+    -webkit-appearance:none;
+}
+.form-group input::placeholder,
+.form-group textarea::placeholder { color: var(--text-faint); }
+.form-group select option { background: var(--bg-modal); color: var(--text-primary); }
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus { outline:none; border-color: var(--accent); background: var(--bg-surface); }
+.form-group textarea { resize:vertical; min-height:75px; }
+
+.form-tabs { display:flex; border-bottom:1px solid var(--border); margin-bottom:20px; }
+.form-tab {
+    flex:1; padding:10px; text-align:center; cursor:pointer;
+    font-size:11px; text-transform:uppercase; font-weight:600;
+    color: var(--text-faint); transition: color var(--transition);
+}
+.form-tab.active { color: var(--text-primary); border-bottom:2px solid var(--accent); margin-bottom:-1px; }
+
+.form-submit {
+    width:100%; padding:13px;
+    background: var(--accent-soft);
+    border:1.5px solid var(--accent-border);
+    color: var(--text-primary);
+    font-size:12px; text-transform:uppercase; letter-spacing:1px;
+    cursor:pointer; transition: all var(--transition); margin-top:6px;
+}
+.form-submit:hover { background: var(--accent-border); border-color: var(--accent); box-shadow: 0 0 18px var(--accent-glow); }
+.form-error   { color: var(--red); font-size:12px; margin-top:6px; display:none; }
+.form-success { color: var(--green); font-size:12px; text-align:center; margin-top:10px; display:none; }
+
+.file-upload {
+    border:1.5px dashed var(--border); padding:18px; text-align:center;
+    cursor:pointer; transition:border-color var(--transition);
+    background: var(--bg-input); position:relative;
+}
+.file-upload:hover { border-color: var(--accent-border); }
+.file-upload input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+.file-upload-label { font-size:13px; color: var(--text-faint); }
+.file-preview { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+.file-preview img { width:64px; height:64px; object-fit:cover; border:1px solid var(--border); }
+
+.media-url-input {
+    flex:1; padding:9px 12px;
+    border:1.5px solid var(--border);
+    font-family:inherit; font-size:13px;
+    background: var(--bg-input); color: var(--text-primary);
+    transition: border-color var(--transition);
+}
+.media-url-input:focus { outline:none; border-color: var(--accent); }
+.media-url-btn {
+    padding:9px 14px; background: var(--accent-soft);
+    color: var(--text-secondary);
+    border:1.5px solid var(--accent-border);
+    font-family:inherit; font-size:11px; text-transform:uppercase;
+    cursor:pointer; white-space:nowrap; transition: all var(--transition);
+}
+.media-url-btn:hover { background: var(--accent-border); color: var(--text-primary); }
+
+/* ══════════════════════════════════════════
+   MEDIA UPLOAD (admin)
+══════════════════════════════════════════ */
+.media-upload-zone {
+    border:1.5px dashed var(--border); padding:22px; text-align:center;
+    cursor:pointer; transition: all var(--transition); background: var(--bg-input);
+}
+.media-upload-zone:hover { border-color: var(--accent-border); background: var(--bg-surface); }
+.media-upload-hint p { font-size:12px; color: var(--text-muted); margin-top:5px; }
+.media-preview-list { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.media-thumb {
+    position:relative; width:88px; height:88px;
+    border:1px solid var(--border); overflow:hidden;
+    flex-shrink:0; background: var(--bg-surface);
+}
+.media-thumb img, .media-thumb video { width:100%; height:100%; object-fit:cover; }
+.media-thumb__remove {
+    position:absolute; top:3px; right:3px;
+    background:rgba(0,0,0,.7); color:#fff; border:none;
+    width:20px; height:20px; font-size:11px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+}
+.media-thumb__remove:hover { background: var(--red); }
+.media-thumb__type {
+    position:absolute; bottom:3px; left:3px;
+    background:rgba(0,0,0,.65); color:#fff; font-size:8px;
+    padding:1px 5px; text-transform:uppercase;
+}
+
+/* ══════════════════════════════════════════
+   LIGHTBOX
+══════════════════════════════════════════ */
+#lightboxModal { background:rgba(4,3,12,0.94); }
+.lightbox {
+    position:relative; display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    width:100%; max-width:920px; margin:auto; padding:16px 16px 32px;
+}
+.lightbox__close {
+    position:fixed; top:18px; right:22px; font-size:28px;
+    color:rgba(255,255,255,.7); background:none; border:none;
+    cursor:pointer; z-index:10; transition:color var(--transition);
+}
+.lightbox__close:hover { color:#fff; }
+.lightbox__media { width:100%; max-height:74vh; display:flex; align-items:center; justify-content:center; }
+.lightbox__media img { max-width:100%; max-height:74vh; object-fit:contain; user-select:none; }
+.lightbox__media video { max-width:100%; max-height:74vh; }
+.lightbox__nav {
+    position:fixed; top:50%; transform:translateY(-50%);
+    background:rgba(255,255,255,.08); color:#fff; border:none;
+    font-size:44px; padding:10px 16px; cursor:pointer;
+    transition:background var(--transition); z-index:10; user-select:none; line-height:1;
+}
+.lightbox__nav:hover { background:rgba(255,255,255,.2); }
+.lightbox__nav--prev { left:10px; }
+.lightbox__nav--next { right:10px; }
+.lightbox__counter { color:rgba(255,255,255,.45); font-size:12px; margin-top:12px; letter-spacing:1px; }
+.lightbox__thumbs { display:flex; gap:7px; margin-top:12px; flex-wrap:wrap; justify-content:center; max-width:800px; }
+.lightbox__thumb {
+    width:56px; height:56px; object-fit:cover; cursor:pointer;
+    border:2px solid transparent; opacity:.5; transition: all .2s; flex-shrink:0;
+}
+.lightbox__thumb.active { border-color: var(--accent); opacity:1; }
+.lightbox__thumb:hover { opacity:.8; }
+.lightbox__thumb-video {
+    width:56px; height:56px; cursor:pointer; border:2px solid transparent;
+    opacity:.5; transition: all .2s; background:rgba(255,255,255,.08);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0; color:#fff; font-size:20px;
+}
+.lightbox__thumb-video.active { border-color: var(--accent); opacity:1; }
+.lightbox__thumb-video:hover { opacity:.8; }
+
+/* ── Reviews in lightbox ── */
+.lb-reviews {
+    width:100%; max-width:680px;
+    margin-top:28px;
+    border-top:1px solid rgba(255,255,255,.08);
+    padding-top:20px;
+}
+.lb-reviews__title {
+    font-size:11px; text-transform:uppercase; letter-spacing:1.5px;
+    color:rgba(255,255,255,.35); font-weight:600; margin-bottom:16px;
+}
+.review-card {
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.07);
+    padding:12px 16px; margin-bottom:10px;
+}
+.review-card__head {
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:6px;
+}
+.review-card__author { font-size:12px; font-weight:700; color:rgba(220,210,240,.85); }
+.review-card__date   { font-size:10px; color:rgba(255,255,255,.3); }
+.review-card__stars  { font-size:13px; margin-bottom:4px; }
+.review-card__text   { font-size:13px; color:rgba(200,185,230,.7); line-height:1.55; }
+
+.review-form {
+    margin-top:16px; border-top:1px solid rgba(255,255,255,.06);
+    padding-top:16px;
+}
+.review-form__title {
+    font-size:11px; text-transform:uppercase; letter-spacing:1px;
+    color:rgba(255,255,255,.3); margin-bottom:10px;
+}
+.review-stars-input { display:flex; gap:6px; margin-bottom:10px; }
+.review-star {
+    font-size:22px; cursor:pointer; color:rgba(255,255,255,.2);
+    transition:color .15s; line-height:1;
+    background:none; border:none;
+}
+.review-star.active { color: var(--gold); }
+.review-text-input {
+    width:100%; padding:10px 12px;
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.1);
+    color:rgba(220,210,240,.9);
+    font-family:inherit; font-size:13px; resize:vertical; min-height:70px;
+    transition:border-color .2s;
+}
+.review-text-input:focus { outline:none; border-color:rgba(180,160,220,.4); }
+.review-submit {
+    margin-top:8px; padding:9px 20px;
+    background:rgba(180,160,220,.15);
+    border:1.5px solid rgba(180,160,220,.3);
+    color:rgba(220,210,240,.85);
+    font-size:11px; text-transform:uppercase; letter-spacing:.5px;
+    cursor:pointer; transition:all .2s;
+}
+.review-submit:hover { background:rgba(180,160,220,.28); }
+
+/* ══════════════════════════════════════════
+   USERS TABLE
+══════════════════════════════════════════ */
+.users-table { width:100%; border-collapse:collapse; font-size:12px; margin-top:10px; }
+.users-table th {
+    background: var(--bg-admin); color: var(--text-muted);
+    padding:8px 12px; text-align:left; text-transform:uppercase;
+    font-size:10px; letter-spacing:.5px;
+    border-bottom:1px solid var(--border);
+}
+.users-table td {
+    padding:9px 12px; border-bottom:1px solid var(--border);
+    vertical-align:middle; color: var(--text-secondary);
+}
+.users-table tr:hover td { background: var(--accent-soft); }
+.role-badge { padding:2px 7px; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; }
+.role-badge.user { background: var(--green-soft); color: var(--green); }
+.role-badge.admin { background: var(--red-soft); color: var(--red); }
+.section-title {
+    margin-top:24px; font-size:12px; text-transform:uppercase; letter-spacing:1px;
+    font-weight:700; border-top:1px solid var(--border); padding-top:18px;
+    color: var(--text-secondary);
+}
+
+/* ══════════════════════════════════════════
+   PROFILE PAGE
+══════════════════════════════════════════ */
+.profile-header {
+    display:flex; align-items:center; gap:24px;
+    padding:40px 40px 28px; border-bottom:1px solid var(--border);
+}
+.profile-avatar {
+    width:72px; height:72px; border-radius:50%;
+    background:var(--accent-soft); border:2px solid var(--accent-border);
+    display:flex; align-items:center; justify-content:center;
+    font-size:32px; flex-shrink:0;
+}
+.profile-name  { font-size:20px; font-weight:700; color:var(--text-primary); margin-bottom:4px; }
+.profile-email { font-size:13px; color:var(--text-muted); }
+.profile-phone { font-size:13px; color:var(--text-muted); }
+.profile-tabs  {
+    display:flex; border-bottom:1px solid var(--border);
+    padding:0 40px; overflow-x:auto;
+}
+.profile-tab {
+    padding:14px 20px; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.5px;
+    background:none; border:none; border-bottom:2px solid transparent; margin-bottom:-1px;
+    cursor:pointer; color:var(--text-muted); transition:all var(--transition); white-space:nowrap;
+}
+.profile-tab:hover { color:var(--text-secondary); }
+.profile-tab.active { color:var(--text-primary); border-bottom-color:var(--accent); }
+.profile-empty { text-align:center; padding:60px 20px; color:var(--text-muted); font-size:14px; }
+#profileContent { padding:24px 40px; }
+
+/* ORDER CARDS */
+.order-card { background:var(--bg-card); border:1px solid var(--border); margin-bottom:12px; transition:box-shadow var(--transition); }
+.order-card:hover { box-shadow:var(--shadow-card); }
+.order-card__head { display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-bottom:1px solid var(--border); flex-wrap:wrap; gap:8px; }
+.order-card__id   { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text-primary); margin-right:12px; }
+.order-card__date { font-size:11px; color:var(--text-muted); }
+.order-card__status { font-size:12px; font-weight:700; }
+.order-card__body { padding:14px 18px; display:grid; grid-template-columns:1fr 1fr; gap:6px 20px; }
+.order-card__row  { font-size:12px; display:flex; flex-direction:column; }
+.order-card__row span { color:var(--text-muted); font-size:10px; text-transform:uppercase; letter-spacing:.4px; margin-bottom:2px; }
+.order-card__row b { color:var(--text-primary); font-weight:600; }
+.order-card__actions { padding:10px 18px 14px; display:flex; gap:8px; border-top:1px solid var(--border); }
+
+/* HISTORY */
+.history-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px; }
+.history-card { background:var(--bg-card); border:1px solid var(--border); cursor:pointer; transition:box-shadow var(--transition); overflow:hidden; }
+.history-card:hover { box-shadow:var(--shadow-hover); }
+.history-card__img { aspect-ratio:1; overflow:hidden; background:var(--bg-surface); }
+.history-card__img img { width:100%; height:100%; object-fit:cover; transition:transform .4s; }
+.history-card:hover .history-card__img img { transform:scale(1.06); }
+.history-card__info  { padding:10px 12px; }
+.history-card__name  { font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-primary); margin-bottom:4px; }
+.history-card__price { font-size:13px; font-weight:700; color:var(--pearl); margin-bottom:4px; }
+.history-card__time  { font-size:10px; color:var(--text-muted); }
+
+/* SETTINGS */
+.settings-form { max-width:560px; padding-top:20px; }
+.settings-section { font-size:12px; text-transform:uppercase; letter-spacing:1px; font-weight:700; color:var(--text-secondary); border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:16px; }
+
+/* ADMIN PANEL TABS */
+.admin-panel-tabs { display:flex; border-bottom:1px solid var(--border); margin-bottom:16px; flex-wrap:wrap; }
+.admin-panel-tab { padding:10px 18px; font-size:11px; font-weight:600; text-transform:uppercase; background:none; border:none; border-bottom:2px solid transparent; color:var(--text-muted); cursor:pointer; transition:all var(--transition); margin-bottom:-1px; }
+.admin-panel-tab.active { color:var(--text-primary); border-bottom-color:var(--accent); }
+.admin-panel-tab:hover  { color:var(--text-secondary); }
+
+/* ══════════════════════════════════════════
+   CHAT WIDGET
+══════════════════════════════════════════ */
+.chat-fab {
+    position:fixed; bottom:28px; left:28px;
+    width:52px; height:52px;
+    background: var(--accent-soft);
+    border:1.5px solid var(--accent-border);
+    color: var(--text-primary);
+    font-size:22px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    z-index:500; transition:all var(--transition);
+    box-shadow: 0 4px 20px rgba(0,0,0,.4);
+}
+.chat-fab:hover { background:var(--accent-border); transform:scale(1.08); }
+.chat-fab__badge {
+    position:absolute; top:-5px; right:-5px;
+    background:var(--red); color:#fff;
+    font-size:9px; font-weight:700;
+    width:16px; height:16px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+}
+.modal.chat-modal { max-width:480px; padding:28px; }
+.chat-messages {
+    height:320px; overflow-y:auto;
+    border:1px solid var(--border);
+    background:var(--bg-input);
+    padding:12px; margin-bottom:12px;
+    display:flex; flex-direction:column; gap:8px;
+}
+.chat-msg {
+    max-width:78%; padding:9px 13px;
+    font-size:13px; line-height:1.5;
+    word-break:break-word;
+}
+.chat-msg--user {
+    align-self:flex-end;
+    background:var(--accent-soft);
+    border:1px solid var(--accent-border);
+    color:var(--text-primary);
+}
+.chat-msg--admin {
+    align-self:flex-start;
+    background:var(--bg-surface);
+    border:1px solid var(--border);
+    color:var(--text-secondary);
+}
+.chat-msg__meta {
+    font-size:9px; color:var(--text-muted);
+    margin-top:4px; text-align:right;
+}
+.chat-msg--admin .chat-msg__meta { text-align:left; }
+.chat-input-row { display:flex; gap:8px; }
+.chat-input {
+    flex:1; padding:10px 12px;
+    border:1.5px solid var(--border);
+    background:var(--bg-input);
+    color:var(--text-primary);
+    font-family:inherit; font-size:13px;
+    transition:border-color var(--transition);
+}
+.chat-input:focus { outline:none; border-color:var(--accent); }
+.chat-send {
+    padding:10px 18px;
+    background:var(--accent-soft);
+    border:1.5px solid var(--accent-border);
+    color:var(--text-primary);
+    font-size:11px; text-transform:uppercase; letter-spacing:.4px;
+    cursor:pointer; transition:all var(--transition); white-space:nowrap;
+}
+.chat-send:hover { background:var(--accent-border); }
+
+/* Admin messages panel */
+.msg-user-list { display:flex; flex-direction:column; gap:4px; margin-bottom:16px; }
+.msg-user-item {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 14px;
+    border:1px solid var(--border);
+    background:var(--bg-surface);
+    cursor:pointer; transition:all var(--transition);
+}
+.msg-user-item:hover { background:var(--accent-soft); border-color:var(--accent-border); }
+.msg-user-item__name { font-size:13px; font-weight:600; color:var(--text-primary); }
+.msg-user-item__preview { font-size:11px; color:var(--text-muted); margin-top:2px; }
+.msg-user-item__badge {
+    background:var(--red); color:#fff;
+    font-size:9px; font-weight:700;
+    padding:2px 7px; border-radius:10px; white-space:nowrap;
+}
+.msg-thread {
+    border:1px solid var(--border);
+    background:var(--bg-input);
+    padding:12px; height:280px; overflow-y:auto;
+    display:flex; flex-direction:column; gap:8px; margin-bottom:10px;
+}
+.msg-reply-row { display:flex; gap:8px; }
+.msg-reply-input {
+    flex:1; padding:9px 12px;
+    border:1.5px solid var(--border);
+    background:var(--bg-surface);
+    color:var(--text-primary);
+    font-family:inherit; font-size:13px;
+    transition:border-color var(--transition);
+}
+.msg-reply-input:focus { outline:none; border-color:var(--accent); }
+.msg-back {
+    background:none; border:none; color:var(--text-muted);
+    font-size:12px; cursor:pointer; padding:0 0 12px;
+    display:flex; align-items:center; gap:6px;
+    transition:color var(--transition);
+}
+.msg-back:hover { color:var(--text-primary); }
+
+/* ══════════════════════════════════════════
+   FOOTER
+══════════════════════════════════════════ */
+.footer { background: var(--bg-footer); border-top:1px solid var(--border); width:100%; }
+.footer__inner {
+    max-width:1400px; margin:0 auto; padding:48px 40px 36px;
+    display:grid; grid-template-columns:1fr 1fr 1fr; gap:40px; align-items:start;
+}
+.footer__logo {
+    font-size:17px; font-weight:700; text-transform:uppercase;
+    letter-spacing:2px; margin-bottom:8px; color:#d4cce8;
+}
+.footer__tagline { font-size:13px; color:rgba(200,185,230,0.35); line-height:1.6; }
+.footer__label {
+    font-size:10px; text-transform:uppercase; letter-spacing:1px;
+    color:rgba(200,185,230,0.3); margin-bottom:12px; font-weight:600;
+}
+.footer__links { display:flex; flex-direction:column; gap:9px; }
+.footer__social-btn {
+    display:inline-flex; align-items:center; gap:9px; padding:10px 16px;
+    font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.5px;
+    border:1.5px solid rgba(200,185,230,0.12); color:rgba(200,185,230,0.45);
+    transition: all var(--transition); width:fit-content;
+}
+.footer__social-btn:hover { border-color:rgba(200,185,230,0.35); color:#d4cce8; }
+.footer__social-btn--ig:hover { background:rgba(225,48,108,.12); border-color:#e1306c; color:#e1306c; }
+.footer__social-btn--tt:hover { background:rgba(105,201,208,.1); border-color:#69c9d0; color:#69c9d0; }
+.footer__army-text { font-size:13px; color:rgba(200,185,230,0.38); line-height:1.6; margin-bottom:14px; }
+.footer__army-btns { display:flex; flex-direction:column; gap:9px; }
+.footer__army-btn {
+    display:inline-block; padding:10px 16px; font-size:12px; font-weight:700;
+    text-transform:uppercase; letter-spacing:.5px; transition: all var(--transition);
+    border:1.5px solid rgba(218,255,6,0.35); color:rgba(218,255,6,0.65); width:fit-content;
+}
+.footer__army-btn:hover { background:rgba(218,255,6,.1); color:#daff06; border-color:#daff06; }
+.footer__army-btn--alt { border-color:rgba(200,185,230,.15); color:rgba(200,185,230,.38); }
+.footer__army-btn--alt:hover { color:#d4cce8; border-color:rgba(200,185,230,.4); background:rgba(200,185,230,.06); }
+.footer__bottom {
+    border-top:1px solid rgba(200,185,230,.06); padding:16px 40px;
+    max-width:1400px; margin:0 auto;
+    display:flex; justify-content:space-between;
+    font-size:11px; color:rgba(200,185,230,.18);
+}
+
+/* ══════════════════════════════════════════
+   NOTIFICATION
+══════════════════════════════════════════ */
+.notif {
+    position:fixed; bottom:24px; right:24px; z-index:9999;
+    background: var(--bg-modal); border:1px solid var(--accent-border);
+    color: var(--text-primary); padding:12px 20px; font-size:13px;
+    transform:translateY(80px); opacity:0; transition:.28s; pointer-events:none;
+    backdrop-filter:blur(10px); max-width:320px;
+}
+.notif.show { transform:translateY(0); opacity:1; }
+.notif.success { border-color: rgba(92,184,138,.4); color: var(--green); }
+.notif.error   { border-color: rgba(200,80,100,.4); color: var(--red); }
+
+/* ══════════════════════════════════════════
+   RESPONSIVE — Tablet (≤1100px)
+══════════════════════════════════════════ */
+@media (max-width:1100px) {
+    .home-catalog__grid,
+    .products-grid { grid-template-columns:repeat(3,1fr); }
+}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE — ≤768px
+══════════════════════════════════════════ */
+@media (max-width:768px) {
+    .header__inner { padding:14px 20px; gap:12px; }
+    .logo { font-size:15px; letter-spacing:1.5px; }
+    .nav { gap:10px; }
+    .nav__link { font-size:12px; }
+
+    .home-catalog__grid,
+    .products-grid { grid-template-columns:repeat(2,1fr); }
+
+    .categories__row { padding:0 20px; gap:12px; }
+    .category { min-width:100px; max-width:140px; }
+    .category__img { width:110px; height:110px; }
+    .category span { font-size:10px; }
+
+    .home-catalog__header { padding:20px 20px 14px; }
+    .home-catalog__title { font-size:16px; letter-spacing:2px; }
+
+    .page-header { padding:24px 20px 12px; }
+    .page-header h1 { font-size:18px; letter-spacing:2px; }
+
+    .filter-bar { padding:12px 20px; }
+    .filter-select, .filter-input { min-width:120px; }
+
+    .footer__inner { grid-template-columns:1fr 1fr; gap:28px; padding:32px 20px 24px; }
+    .admin-bar { padding:10px 20px; }
+    .static-page { padding:40px 20px; }
+    .static-page h1 { font-size:22px; }
+    .profile-header { padding:24px 20px; flex-direction:column; text-align:center; }
+    .profile-tabs   { padding:0 10px; }
+    #profileContent { padding:16px 20px; }
+    .order-card__body { grid-template-columns:1fr; }
+    .chat-fab { bottom:16px; left:16px; width:46px; height:46px; font-size:19px; }
+}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE — ≤480px
+══════════════════════════════════════════ */
+@media (max-width:480px) {
+    .header__inner { flex-wrap:wrap; padding:12px 16px; }
+    .logo { font-size:14px; }
+    .nav { width:100%; justify-content:center; flex-wrap:wrap; gap:8px; }
+    .nav__link { font-size:11px; }
+    .nav__btn, .theme-toggle { padding:7px 12px; font-size:11px; }
+
+    .home-catalog__grid,
+    .products-grid { grid-template-columns:1fr 1fr; }
+
+    .category__img { width:88px; height:88px; }
+    .category span { font-size:9px; letter-spacing:.5px; }
+
+    .modal { padding:22px 18px; max-width:100%; }
+    .modal h2 { font-size:15px; }
+
+    .footer__inner { grid-template-columns:1fr; gap:24px; padding:28px 16px 20px; }
+    .footer__bottom { flex-direction:column; gap:4px; padding:14px 16px; font-size:10px; }
+
+    .lightbox__nav { font-size:32px; padding:8px 10px; }
+    .lightbox__thumb, .lightbox__thumb-video { width:44px; height:44px; }
+
+    .product-card__info { padding:12px; }
+    .product-card__name { font-size:12px; }
+    .product-card__price { font-size:14px; }
+}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE — ≤360px
+══════════════════════════════════════════ */
+@media (max-width:360px) {
+    .home-catalog__grid,
+    .products-grid { grid-template-columns:1fr; }
+    .categories__row { gap:8px; }
+    .category { min-width:80px; max-width:110px; }
+    .category__img { width:76px; height:76px; }
+}
+
+/* ══════════════════════════════════════════
+   LIGHT THEME overrides
+══════════════════════════════════════════ */
+[data-theme="light"] .category__img { border-color:rgba(100,80,180,0.15); background:#f0edf8; }
+[data-theme="light"] .product-card { box-shadow: var(--shadow-card); }
+[data-theme="light"] .product-card__cat-badge { background:rgba(250,248,255,0.9); color:#5040a0; border-color:rgba(100,80,180,0.2); }
+[data-theme="light"] .modal-overlay { background:rgba(20,16,40,0.45); }
+[data-theme="light"] .users-table th { background:#f0edf8; }
+[data-theme="light"] #lightboxModal { background:rgba(10,8,24,0.88); }
+[data-theme="light"] .chat-fab { box-shadow:0 4px 20px rgba(60,40,120,0.2); }
+
+// ============================================================
+//  CHRISTIAN JEWELRY — Main JS  v6
+//  USE_SERVER = false  →  localStorage
+//  USE_SERVER = true   →  REST API localhost:3000
+// ============================================================
+
+const USE_SERVER = false;
+const API_URL    = 'http://localhost:3000/api';
+
+// ════════════════════════════════════════════════════════════
+//  DB LAYER
+// ════════════════════════════════════════════════════════════
+const DB = USE_SERVER ? {
+    _userId: () => { const u=JSON.parse(sessionStorage.getItem('cj_current')||'null'); return u?u.id:null; },
+    _headers() { const h={'Content-Type':'application/json'}; const id=this._userId(); if(id) h['x-user-id']=id; return h; },
+    async getProducts(cat){ const u=cat?`${API_URL}/products?category=${cat}`:`${API_URL}/products`; return (await fetch(u)).json(); },
+    async addProduct(d){ return (await fetch(`${API_URL}/products`,{method:'POST',headers:this._headers(),body:JSON.stringify(d)})).json(); },
+    async updateProduct(id,d){ return (await fetch(`${API_URL}/products/${id}`,{method:'PUT',headers:this._headers(),body:JSON.stringify(d)})).json(); },
+    async deleteProduct(id){ return (await fetch(`${API_URL}/products/${id}`,{method:'DELETE',headers:this._headers()})).json(); },
+    async login(e,p){ return (await fetch(`${API_URL}/auth/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:e,password:p})})).json(); },
+    async register(d){ return (await fetch(`${API_URL}/auth/register`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)})).json(); },
+    async updateProfile(id,d){ return (await fetch(`${API_URL}/users/${id}`,{method:'PUT',headers:this._headers(),body:JSON.stringify(d)})).json(); },
+    async getUsers(){ return (await fetch(`${API_URL}/users`,{headers:this._headers()})).json(); },
+    async getOrders(){ return (await fetch(`${API_URL}/orders`,{headers:this._headers()})).json(); },
+    async getUserOrders(uid){ return (await fetch(`${API_URL}/orders?userId=${uid}`,{headers:this._headers()})).json(); },
+    async addOrder(d){ return (await fetch(`${API_URL}/orders`,{method:'POST',headers:this._headers(),body:JSON.stringify(d)})).json(); },
+    async updateOrder(id,d){ return (await fetch(`${API_URL}/orders/${id}`,{method:'PATCH',headers:this._headers(),body:JSON.stringify(d)})).json(); },
+    async cancelOrder(id){ return (await fetch(`${API_URL}/orders/${id}/cancel`,{method:'POST',headers:this._headers()})).json(); },
+    async addHistory(productId){ return (await fetch(`${API_URL}/history`,{method:'POST',headers:this._headers(),body:JSON.stringify({productId})})).json(); },
+    async getHistory(){ return (await fetch(`${API_URL}/history`,{headers:this._headers()})).json(); },
+    // Wishlist, Reviews, Messages — server stubs (implement on backend as needed)
+    async toggleWishlist(pid){ return (await fetch(`${API_URL}/wishlist/${pid}`,{method:'POST',headers:this._headers()})).json(); },
+    async getWishlist(){ return (await fetch(`${API_URL}/wishlist`,{headers:this._headers()})).json(); },
+    async addReview(d){ return (await fetch(`${API_URL}/reviews`,{method:'POST',headers:this._headers(),body:JSON.stringify(d)})).json(); },
+    async getReviews(pid){ return (await fetch(`${API_URL}/reviews?productId=${pid}`)).json(); },
+    async sendMessage(d){ return (await fetch(`${API_URL}/messages`,{method:'POST',headers:this._headers(),body:JSON.stringify(d)})).json(); },
+    async getMessages(uid){ return (await fetch(`${API_URL}/messages?userId=${uid}`,{headers:this._headers()})).json(); },
+    async getAllMessages(){ return (await fetch(`${API_URL}/messages`,{headers:this._headers()})).json(); },
+} : {
+    _get: k => JSON.parse(localStorage.getItem(k)||'[]'),
+    _set: (k,v) => localStorage.setItem(k,JSON.stringify(v)),
+
+    async getProducts(cat){ const all=this._get('cj_products'); return cat?all.filter(p=>p.category===cat):all; },
+    async addProduct(d){ const list=this._get('cj_products'); const p={id:uid(),...d,createdAt:now()}; list.push(p); this._set('cj_products',list); return {success:true,product:p}; },
+    async updateProduct(id,d){ const list=this._get('cj_products'); const i=list.findIndex(p=>p.id===id); if(i<0) return {error:'Не знайдено'}; list[i]={...list[i],...d,updatedAt:now()}; this._set('cj_products',list); return {success:true,product:list[i]}; },
+    async deleteProduct(id){ this._set('cj_products',this._get('cj_products').filter(p=>p.id!==id)); return {success:true}; },
+
+    async login(email,password){
+        const u=this._get('cj_users').find(u=>u.email===email&&u.password===password);
+        if(!u) return {error:'Невірний email або пароль'};
+        const {password:_,...safe}=u; return {success:true,user:safe};
+    },
+    async register(d){
+        const users=this._get('cj_users');
+        if(users.find(u=>u.email===d.email)) return {error:'Цей email вже зареєстрований'};
+        const nu={id:uid(),...d,role:'user',createdAt:now()};
+        users.push(nu); this._set('cj_users',users);
+        const {password:_,...safe}=nu; return {success:true,user:safe};
+    },
+    async updateProfile(id,d){
+        const users=this._get('cj_users');
+        const i=users.findIndex(u=>u.id===id); if(i<0) return {error:'Не знайдено'};
+        if(!d.password) d.password=users[i].password;
+        users[i]={...users[i],...d,updatedAt:now()};
+        this._set('cj_users',users);
+        const {password:_,...safe}=users[i]; return {success:true,user:safe};
+    },
+    async getUsers(){ return this._get('cj_users').filter(u=>u.role!=='admin').map(({password:_,...u})=>u); },
+
+    async getOrders(){ return this._get('cj_orders'); },
+    async getUserOrders(uid){ return this._get('cj_orders').filter(o=>o.userId===uid); },
+    async addOrder(d){
+        const orders=this._get('cj_orders');
+        const o={id:uid(),...d,status:'new',createdAt:now()};
+        orders.push(o); this._set('cj_orders',orders); return {success:true,orderId:o.id};
+    },
+    async updateOrder(id,d){
+        const orders=this._get('cj_orders');
+        const i=orders.findIndex(o=>o.id===id); if(i<0) return {error:'Не знайдено'};
+        if(orders[i].status!=='new') return {error:'Замовлення вже в роботі — зміни неможливі'};
+        orders[i]={...orders[i],...d,updatedAt:now()};
+        this._set('cj_orders',orders); return {success:true,order:orders[i]};
+    },
+    async cancelOrder(id){
+        const orders=this._get('cj_orders');
+        const i=orders.findIndex(o=>o.id===id); if(i<0) return {error:'Не знайдено'};
+        if(orders[i].status==='done') return {error:'Виконане замовлення не можна скасувати'};
+        orders[i].status='cancelled'; orders[i].updatedAt=now();
+        this._set('cj_orders',orders); return {success:true};
+    },
+
+    // ── Wishlist ─────────────────────────────────────────────
+    async toggleWishlist(productId){
+        if(!currentUser) return {error:'Не авторизовано'};
+        const key=`cj_wishlist_${currentUser.id}`;
+        let list=JSON.parse(localStorage.getItem(key)||'[]');
+        const idx=list.indexOf(productId);
+        if(idx>=0) list.splice(idx,1); else list.unshift(productId);
+        localStorage.setItem(key,JSON.stringify(list));
+        return {success:true, added:idx<0};
+    },
+    async getWishlist(){
+        if(!currentUser) return [];
+        const key=`cj_wishlist_${currentUser.id}`;
+        const ids=JSON.parse(localStorage.getItem(key)||'[]');
+        const products=this._get('cj_products');
+        return ids.map(id=>products.find(p=>p.id===id)).filter(Boolean);
+    },
+    isWishlisted(productId){
+        if(!currentUser) return false;
+        const key=`cj_wishlist_${currentUser.id}`;
+        const list=JSON.parse(localStorage.getItem(key)||'[]');
+        return list.includes(productId);
+    },
+
+    // ── Reviews ──────────────────────────────────────────────
+    async addReview(d){
+        const reviews=this._get('cj_reviews');
+        // один відгук на продукт від одного користувача
+        const existing=reviews.findIndex(r=>r.productId===d.productId&&r.userId===d.userId);
+        if(existing>=0){ reviews[existing]={...reviews[existing],...d,updatedAt:now()}; }
+        else { reviews.push({id:uid(),...d,createdAt:now()}); }
+        this._set('cj_reviews',reviews); return {success:true};
+    },
+    async getReviews(productId){
+        return this._get('cj_reviews').filter(r=>r.productId===productId);
+    },
+
+    // ── Messages (user ↔ admin) ───────────────────────────────
+    async sendMessage(d){
+        const msgs=this._get('cj_messages');
+        msgs.push({id:uid(),...d,read:false,createdAt:now()});
+        this._set('cj_messages',msgs); return {success:true};
+    },
+    async getMessages(userId){
+        return this._get('cj_messages').filter(m=>m.userId===userId);
+    },
+    async getAllMessages(){
+        return this._get('cj_messages');
+    },
+    async markMessagesRead(userId){
+        // mark admin replies as read by user
+        const msgs=this._get('cj_messages');
+        msgs.forEach(m=>{ if(m.userId===userId&&m.fromAdmin) m.read=true; });
+        this._set('cj_messages',msgs); return {success:true};
+    },
+
+    // ── History ──────────────────────────────────────────────
+    async addHistory(productId){
+        if(!currentUser) return;
+        const key=`cj_history_${currentUser.id}`;
+        let hist=JSON.parse(localStorage.getItem(key)||'[]');
+        hist=hist.filter(h=>h.productId!==productId);
+        hist.unshift({productId,viewedAt:now()});
+        if(hist.length>50) hist=hist.slice(0,50);
+        localStorage.setItem(key,JSON.stringify(hist));
+        return {success:true};
+    },
+    async getHistory(){
+        if(!currentUser) return [];
+        const key=`cj_history_${currentUser.id}`;
+        const hist=JSON.parse(localStorage.getItem(key)||'[]');
+        const products=this._get('cj_products');
+        return hist.map(h=>({...h,product:products.find(p=>p.id===h.productId)||null})).filter(h=>h.product);
+    },
+    async clearHistory(){
+        if(!currentUser) return;
+        localStorage.removeItem(`cj_history_${currentUser.id}`);
+        return {success:true};
+    },
+
+    exportJSON(){
+        const data={exportedAt:now(),users:this._get('cj_users'),products:this._get('cj_products'),orders:this._get('cj_orders')};
+        const a=document.createElement('a');
+        a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));
+        a.download='cj_backup_'+new Date().toISOString().slice(0,10)+'.json'; a.click();
+    }
+};
+
+// ════════════════════════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════════════════════════
+function uid()  { return Date.now().toString(36)+Math.random().toString(36).slice(2); }
+function now()  { return new Date().toISOString(); }
+function esc(s) { if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtDate(iso)     { return iso ? new Date(iso).toLocaleDateString('uk-UA',{day:'2-digit',month:'2-digit',year:'numeric'}) : '—'; }
+function fmtDateTime(iso) { return iso ? new Date(iso).toLocaleString('uk-UA',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—'; }
+
+// ════════════════════════════════════════════════════════════
+//  SEED ADMIN
+// ════════════════════════════════════════════════════════════
+if(!USE_SERVER){
+    const users=JSON.parse(localStorage.getItem('cj_users')||'[]');
+    if(!users.find(u=>u.email==='admin@christianjewelry.ua')){
+        users.push({id:'admin',name:'Адмін',surname:'',phone:'',email:'admin@christianjewelry.ua',password:'admin123',role:'admin',createdAt:now()});
+        localStorage.setItem('cj_users',JSON.stringify(users));
+    }
+}
+
+// ════════════════════════════════════════════════════════════
+//  SESSION
+// ════════════════════════════════════════════════════════════
+let currentUser = JSON.parse(sessionStorage.getItem('cj_current')||'null');
+
+// ════════════════════════════════════════════════════════════
+//  CATEGORIES
+// ════════════════════════════════════════════════════════════
+const CATEGORIES = {
+    rings:'Каблучки / Перстні', earrings:'Сережки', pendants:'Підвіски',
+    bracelets:'Браслети', necklaces:"Коль'є", brooches:'Брошки', custom:'Індивідуальне',
+};
+let currentCategory = null;
+
+// ════════════════════════════════════════════════════════════
+//  PAGES + HISTORY API
+// ════════════════════════════════════════════════════════════
+function showPage(name, pushState=true) {
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.querySelectorAll('.nav__link').forEach(l=>l.classList.remove('active'));
+    const page=document.getElementById('page-'+name);
+    if(page) page.classList.add('active');
+    // highlight nav
+    document.querySelectorAll('.nav__link').forEach(l=>{
+        if(l.getAttribute('onclick')&&l.getAttribute('onclick').includes(`'${name}'`)) l.classList.add('active');
+    });
+    window.scrollTo(0,0);
+    if(name==='home') renderHomeCatalog();
+    if(name==='profile') renderProfilePage();
+    if(pushState) history.pushState({page:name,category:null},'','#'+name);
+}
+
+function showCategory(catKey, pushState=true){
+    currentCategory=catKey;
+    document.getElementById('categoryTitle').textContent=CATEGORIES[catKey]||catKey;
+    // set category filter and load
+    document.getElementById('filterCategory').value=catKey;
+    renderCategoryProducts(catKey);
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById('page-category').classList.add('active');
+    window.scrollTo(0,0);
+    if(pushState) history.pushState({page:'category',category:catKey},'','#category-'+catKey);
+}
+
+window.addEventListener('popstate',e=>{
+    const s=e.state;
+    if(!s){showPage('home',false);return;}
+    if(s.page==='category'&&s.category) showCategory(s.category,false);
+    else showPage(s.page||'home',false);
+});
+
+// ════════════════════════════════════════════════════════════
+//  CARD BUILDER
+// ════════════════════════════════════════════════════════════
+const PLACEHOLDER=`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><rect fill='%23f0f0f0' width='400' height='400'/><text x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23bbb' font-size='60'>✦</text></svg>`;
+
+function getMedia(p){ if(p.media&&p.media.length) return p.media; if(p.img) return [{type:'image',src:p.img}]; return []; }
+
+function buildCard(p, showBadge) {
+    const role=currentUser?currentUser.role:'guest';
+    const badge=showBadge?`<div class="product-card__cat-badge">${esc(CATEGORIES[p.category]||p.category)}</div>`:'';
+    const orderBtn=role!=='guest'&&role!=='admin'?`<button class="btn-sm" onclick="openOrderModal('${esc(p.name)}')">Замовити</button>`:'';
+    const editBtn=role==='admin'?`<button class="btn-sm warning" onclick="openEditModal('${esc(p.id)}')">Редагувати</button>`:'';
+    const delBtn=role==='admin'?`<button class="btn-sm danger" onclick="deleteProduct('${esc(p.id)}')">Видалити</button>`:'';
+    const actions=(orderBtn||editBtn||delBtn)?`<div class="product-card__actions">${orderBtn}${editBtn}${delBtn}</div>`:'';
+    const price=p.price?`<div class="product-card__price">${Number(p.price).toLocaleString('uk-UA')} грн</div>`:'';
+    const media=getMedia(p);
+    const firstSrc=media.length?media[0].src:PLACEHOLDER;
+    const isVideo=media.length&&media[0].type==='video';
+    const countBadge=media.length>1?`<div class="product-card__media-count">▶ ${media.length} фото/відео</div>`:'';
+    const mediaEl=isVideo
+        ?`<video src="${esc(firstSrc)}" muted playsinline preload="metadata" style="width:100%;height:100%;object-fit:cover;"></video>`
+        :`<img src="${esc(firstSrc)}" alt="${esc(p.name)}" onerror="this.src='${PLACEHOLDER}'">`;
+
+    // Wishlist button — тільки для авторизованих користувачів (не адмін)
+    const isWished=currentUser&&currentUser.role!=='admin'&&DB.isWishlisted&&DB.isWishlisted(p.id);
+    const wishBtn=(currentUser&&currentUser.role!=='admin')?
+        `<button class="product-card__wishlist${isWished?' active':''}" id="wb-${esc(p.id)}" onclick="toggleWishlist('${esc(p.id)}',this)" title="${isWished?'Прибрати з вибраного':'Додати до вибраного'}">${isWished?'♥':'♡'}</button>`:'';
+
+    return `<div class="product-card" data-id="${esc(p.id)}">
+        ${badge}
+        ${wishBtn}
+        <div class="product-card__img" onclick="trackAndOpenLightbox('${esc(p.id)}')">
+            ${mediaEl}${countBadge}
+        </div>
+        <div class="product-card__info">
+            <div class="product-card__name">${esc(p.name)}</div>
+            ${p.material?`<div class="product-card__material">${esc(p.material)}</div>`:''}
+            ${p.desc?`<div class="product-card__desc">${esc(p.desc)}</div>`:''}
+            ${price}${actions}
+        </div>
+    </div>`;
+}
+
+// Записуємо перегляд і відкриваємо лайтбокс
+async function trackAndOpenLightbox(productId) {
+    if(currentUser) await DB.addHistory(productId);
+    openLightbox(productId, 0);
+}
+
+// ════════════════════════════════════════════════════════════
+//  WISHLIST
+// ════════════════════════════════════════════════════════════
+async function toggleWishlist(productId, btnEl) {
+    if(!currentUser){ showNotif('Для додавання до вибраного потрібно увійти','error'); openAuthModal(); return; }
+    const r=await DB.toggleWishlist(productId);
+    if(r.error){ showNotif(r.error,'error'); return; }
+    const added=r.added;
+    // Оновлюємо всі кнопки для цього продукту на сторінці
+    document.querySelectorAll(`#wb-${productId}`).forEach(btn=>{
+        btn.textContent=added?'♥':'♡';
+        btn.title=added?'Прибрати з вибраного':'Додати до вибраного';
+        btn.classList.toggle('active',added);
+    });
+    showNotif(added?'Додано до вибраного ♥':'Видалено з вибраного','success');
+}
+
+async function renderMyWishlist(container){
+    const items=await DB.getWishlist();
+    if(!items.length){
+        container.innerHTML=`<div class="profile-empty"><p>У вас поки немає вибраних виробів.</p><p style="font-size:12px;margin-top:8px;color:var(--text-muted)">Натисніть ♡ на будь-якому виробі щоб зберегти його тут.</p></div>`;
+        return;
+    }
+    const cards=items.map(p=>{
+        const media=getMedia(p);
+        const src=media.length?media[0].src:PLACEHOLDER;
+        return `<div class="history-card">
+            <div class="history-card__img" onclick="trackAndOpenLightbox('${esc(p.id)}')">
+                <img src="${esc(src)}" alt="${esc(p.name)}" onerror="this.src='${PLACEHOLDER}'">
+            </div>
+            <div class="history-card__info">
+                <div class="history-card__name">${esc(p.name)}</div>
+                ${p.price?`<div class="history-card__price">${Number(p.price).toLocaleString('uk-UA')} грн</div>`:''}
+                ${p.material?`<div class="history-card__time">${esc(p.material)}</div>`:''}
+                <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+                    <button class="btn-sm" onclick="openOrderModal('${esc(p.name)}')">Замовити</button>
+                    <button class="btn-sm danger" onclick="toggleWishlist('${esc(p.id)}',this);renderProfileTab('wishlist')">♡ Прибрати</button>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+    container.innerHTML=`<div class="history-grid">${cards}</div>`;
+}
+
+// ════════════════════════════════════════════════════════════
+//  LIGHTBOX
+// ════════════════════════════════════════════════════════════
+let _lbProducts=[]; let _lbMedia=[]; let _lbIndex=0; let _lbCurrentProductId=null;
+
+async function openLightbox(productId, startIndex) {
+    if(!_lbProducts.length) _lbProducts=await DB.getProducts();
+    const p=_lbProducts.find(x=>x.id===productId); if(!p) return;
+    _lbMedia=getMedia(p); if(!_lbMedia.length) return;
+    _lbCurrentProductId=productId;
+    _lbIndex=startIndex||0; renderLightbox(); openModal('lightboxModal');
+    document.addEventListener('keydown',_lbKeyHandler);
+    renderLightboxReviews(productId);
+}
+
+function closeLightbox(){
+    closeModal('lightboxModal');
+    document.removeEventListener('keydown',_lbKeyHandler);
+    const vid=document.querySelector('#lightboxMedia video'); if(vid) vid.pause();
+    _lbCurrentProductId=null;
+}
+function _lbKeyHandler(e){ if(e.key==='ArrowLeft') lightboxNav(-1); if(e.key==='ArrowRight') lightboxNav(1); if(e.key==='Escape') closeLightbox(); }
+function lightboxNav(dir){ _lbIndex=(_lbIndex+dir+_lbMedia.length)%_lbMedia.length; renderLightbox(); }
+function lightboxGoTo(idx){ _lbIndex=idx; renderLightbox(); }
+
+function renderLightbox(){
+    const item=_lbMedia[_lbIndex];
+    const mediaEl=document.getElementById('lightboxMedia');
+    const oldVid=mediaEl.querySelector('video'); if(oldVid) oldVid.pause();
+    mediaEl.innerHTML=item.type==='video'
+        ?`<video src="${esc(item.src)}" controls autoplay playsinline style="max-width:100%;max-height:72vh;"></video>`
+        :`<img src="${esc(item.src)}" alt="Фото" style="max-width:100%;max-height:72vh;object-fit:contain;">`;
+    document.getElementById('lightboxCounter').textContent=`${_lbIndex+1} / ${_lbMedia.length}`;
+    document.getElementById('lightboxThumbs').innerHTML=_lbMedia.map((m,i)=>
+        m.type==='video'
+            ?`<div class="lightbox__thumb-video ${i===_lbIndex?'active':''}" onclick="lightboxGoTo(${i})">▶</div>`
+            :`<img class="lightbox__thumb ${i===_lbIndex?'active':''}" src="${esc(m.src)}" onclick="lightboxGoTo(${i})">`
+    ).join('');
+    document.querySelector('.lightbox__nav--prev').style.display=_lbMedia.length>1?'':'none';
+    document.querySelector('.lightbox__nav--next').style.display=_lbMedia.length>1?'':'none';
+}
+
+// ════════════════════════════════════════════════════════════
+//  REVIEWS (in lightbox)
+// ════════════════════════════════════════════════════════════
+let _reviewRating=5;
+
+async function renderLightboxReviews(productId){
+    const wrap=document.getElementById('lbReviews');
+    const reviews=await DB.getReviews(productId);
+
+    const stars=n=>['★','★','★','★','★'].map((s,i)=>`<span style="color:${i<n?'var(--gold)':'rgba(255,255,255,.2)'}">${s}</span>`).join('');
+
+    const reviewsHtml=reviews.length
+        ? reviews.map(r=>`
+            <div class="review-card">
+                <div class="review-card__head">
+                    <span class="review-card__author">${esc(r.userName)}</span>
+                    <span class="review-card__date">${fmtDate(r.createdAt||r.updatedAt)}</span>
+                </div>
+                <div class="review-card__stars">${stars(r.rating||5)}</div>
+                <div class="review-card__text">${esc(r.text)}</div>
+            </div>`).join('')
+        : '<p style="font-size:12px;color:rgba(255,255,255,.3);margin-bottom:12px;">Відгуків ще немає — будьте першим!</p>';
+
+    const formHtml=currentUser&&currentUser.role!=='admin'?`
+        <div class="review-form">
+            <div class="review-form__title">Залишити відгук</div>
+            <div class="review-stars-input" id="reviewStars">
+                ${[1,2,3,4,5].map(n=>`<button class="review-star${n<=_reviewRating?' active':''}" onclick="setReviewRating(${n},this.parentNode)">${n<=_reviewRating?'★':'☆'}</button>`).join('')}
+            </div>
+            <textarea class="review-text-input" id="reviewText" placeholder="Ваш відгук про виріб..."></textarea>
+            <button class="review-submit" onclick="submitReview('${esc(productId)}')">✓ Опублікувати відгук</button>
+        </div>` : '';
+
+    wrap.innerHTML=`
+        <div class="lb-reviews__title">Відгуки (${reviews.length})</div>
+        ${reviewsHtml}
+        ${formHtml}`;
+    _reviewRating=5;
+}
+
+function setReviewRating(n, container){
+    _reviewRating=n;
+    container.querySelectorAll('.review-star').forEach((btn,i)=>{
+        btn.textContent=i<n?'★':'☆';
+        btn.classList.toggle('active',i<n);
+    });
+}
+
+async function submitReview(productId){
+    if(!currentUser){ showNotif('Потрібно увійти','error'); return; }
+    const text=document.getElementById('reviewText').value.trim();
+    if(!text){ showNotif('Напишіть текст відгуку','error'); return; }
+    await DB.addReview({productId,userId:currentUser.id,userName:currentUser.name+' '+currentUser.surname,text,rating:_reviewRating});
+    showNotif('Відгук опубліковано!','success');
+    renderLightboxReviews(productId);
+}
+
+// ════════════════════════════════════════════════════════════
+//  FILTER FUNCTIONS - ДОМАШНЯ СТОРІНКА
+// ════════════════════════════════════════════════════════════
+
+function populateMaterialFilterHome(products){
+    const sel=document.getElementById('homeFilterMaterial');
+    const cur=sel.value;
+    const materials=[...new Set(products.map(p=>p.material).filter(Boolean))].sort();
+    sel.innerHTML='<option value="">Усі матеріали</option>'+materials.map(m=>`<option value="${m}">${m}</option>`).join('');
+    if(materials.includes(cur)) sel.value=cur;
+}
+
+function populateGemstonesFilterHome(products){
+    const sel=document.getElementById('homeFilterGemstones');
+    const cur=sel.value;
+    const gemstones=[...new Set(products
+        .map(p=>(p.extras||'').split(',').map(e=>e.trim()).filter(Boolean))
+        .flat()
+    )].sort();
+    sel.innerHTML='<option value="">Усі камені</option>'+gemstones.map(g=>`<option value="${g}">${g}</option>`).join('');
+    if(gemstones.includes(cur)) sel.value=cur;
+}
+
+function applyHomeFilters(){
+    const catFilter=(document.getElementById('homeFilterCategory').value||'').toLowerCase();
+    const matFilter=(document.getElementById('homeFilterMaterial').value||'').toLowerCase();
+    const minPrice=parseFloat(document.getElementById('homeFilterPriceMin').value)||0;
+    const maxPrice=parseFloat(document.getElementById('homeFilterPriceMax').value)||Infinity;
+
+    let filtered=_lbProducts.filter(p=>{
+        const price=p.price?Number(p.price):0;
+        const catOk=!catFilter||( p.category&&p.category.toLowerCase().includes(catFilter) );
+        const matOk=!matFilter||( p.material&&p.material.toLowerCase().includes(matFilter) );
+        const priceOk=price>=minPrice&&price<=maxPrice;
+        return catOk&&matOk&&priceOk;
+    });
+
+    const grid=document.getElementById('homeCatalogGrid');
+    const countEl=document.getElementById('homeFilterCount');
+    if(!filtered.length){
+        grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);"><h3>Нічого не знайдено</h3><p>Спробуйте змінити параметри фільтра.</p></div>`;
+        countEl.textContent='';
+    } else {
+        grid.innerHTML=filtered.map(p=>buildCard(p,true)).join('');
+        countEl.textContent=`Знайдено: ${filtered.length} виріб${filtered.length===1?'':'ів'}`;
+    }
+}
+
+function resetHomeFilters(){
+    document.getElementById('homeFilterMaterial').value='';
+    document.getElementById('homeFilterGemstones').value='';
+    document.getElementById('homeFilterPriceMin').value='';
+    document.getElementById('homeFilterPriceMax').value='';
+    applyHomeFilters();
+}
+
+// ════════════════════════════════════════════════════════════
+//  HOME CATALOG
+// ════════════════════════════════════════════════════════════
+async function renderHomeCatalog(){
+    const grid=document.getElementById('homeCatalogGrid');
+    grid.innerHTML='<div class="home-catalog__empty"><p>Завантаження...</p></div>';
+    try{
+        const products=await DB.getProducts();
+        _lbProducts=products;
+        if(!products.length){ grid.innerHTML=`<div class="home-catalog__empty"><h3>Каталог порожній</h3><p>Адміністратор ще не додав жодного виробу.</p></div>`; return; }
+        // Заповнюємо фільтри та показуємо товари
+        populateMaterialFilterHome(products);
+        applyHomeFilters();
+    }catch(e){ grid.innerHTML='<div class="home-catalog__empty"><p>Помилка завантаження.</p></div>'; }
+}
+
+// ════════════════════════════════════════════════════════════
+//  CATEGORY PAGE + FILTERS
+// ════════════════════════════════════════════════════════════
+let _allCategoryProducts = [];
+
+async function renderCategoryProducts(catKey){
+    const grid=document.getElementById('productsGrid');
+    grid.innerHTML='<div class="empty-state"><p>Завантаження...</p></div>';
+    try{
+        // Якщо є конкретна категорія — грузимо її, інакше всі
+        const products=catKey?await DB.getProducts(catKey):await DB.getProducts();
+        _allCategoryProducts=products;
+        products.forEach(p=>{ if(!_lbProducts.find(x=>x.id===p.id)) _lbProducts.push(p); });
+
+        // Заповнюємо список матеріалів
+        populateMaterialFilter(products);
+        applyFilters();
+    }catch(e){ grid.innerHTML='<div class="empty-state"><p>Помилка завантаження.</p></div>'; }
+}
+
+function populateMaterialFilter(products){
+    const sel=document.getElementById('filterMaterial');
+    const cur=sel.value;
+    const materials=[...new Set(products.map(p=>p.material).filter(Boolean))].sort();
+    sel.innerHTML='<option value="">Усі матеріали</option>'+materials.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join('');
+    if(materials.includes(cur)) sel.value=cur;
+}
+
+function applyFilters(){
+    const catFilter=document.getElementById('filterCategory').value;
+    const matFilter=document.getElementById('filterMaterial').value.toLowerCase();
+    const minPrice=parseFloat(document.getElementById('filterPriceMin').value)||0;
+    const maxPrice=parseFloat(document.getElementById('filterPriceMax').value)||Infinity;
+
+    // Якщо категорія змінилась — підвантажуємо нові товари
+    const loadCat=catFilter||null;
+    if(loadCat!==currentCategory){
+        currentCategory=loadCat;
+        document.getElementById('categoryTitle').textContent=loadCat?(CATEGORIES[loadCat]||loadCat):'Усі вироби';
+        // Перезавантаження без рекурсії через флаг
+        _allCategoryProducts=[];
+        renderCategoryProducts(loadCat);
+        return;
+    }
+
+    let filtered=_allCategoryProducts.filter(p=>{
+        const price=p.price?Number(p.price):0;
+        const matOk=!matFilter||( p.material&&p.material.toLowerCase().includes(matFilter) );
+        const priceOk=price>=minPrice&&price<=maxPrice;
+        return matOk&&priceOk;
+    });
+
+    const grid=document.getElementById('productsGrid');
+    const countEl=document.getElementById('filterCount');
+    if(!filtered.length){
+        grid.innerHTML=`<div class="empty-state"><h3>Нічого не знайдено</h3><p>Спробуйте змінити параметри фільтра.</p></div>`;
+        countEl.textContent='';
+    } else {
+        grid.innerHTML=filtered.map(p=>buildCard(p,!catFilter)).join('');
+        countEl.textContent=`Знайдено: ${filtered.length} виріб${filtered.length===1?'':'ів'}`;
+    }
+}
+
+function resetFilters(){
+    document.getElementById('filterMaterial').value='';
+    document.getElementById('filterPriceMin').value='';
+    document.getElementById('filterPriceMax').value='';
+    // Не скидаємо категорію — лише матеріал і ціну
+    applyFilters();
+}
+
+// ════════════════════════════════════════════════════════════
+//  PROFILE PAGE
+// ════════════════════════════════════════════════════════════
+async function renderProfilePage(){
+    if(!currentUser){ showPage('home'); return; }
+    const activeTab=document.querySelector('.profile-tab.active');
+    const tab=activeTab?activeTab.dataset.tab:'orders';
+    renderProfileTab(tab);
+}
+
+function switchProfileTab(tab){
+    document.querySelectorAll('.profile-tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));
+    renderProfileTab(tab);
+}
+
+async function renderProfileTab(tab){
+    document.getElementById('profileName').textContent=`${currentUser.name} ${currentUser.surname}`;
+    document.getElementById('profileEmail').textContent=currentUser.email;
+    document.getElementById('profilePhone').textContent=currentUser.phone||'—';
+
+    const content=document.getElementById('profileContent');
+    content.innerHTML='<p style="padding:20px;color:var(--text-muted)">Завантаження...</p>';
+
+    if(tab==='orders')   await renderMyOrders(content);
+    if(tab==='wishlist') await renderMyWishlist(content);
+    if(tab==='history')  await renderMyHistory(content);
+    if(tab==='settings') renderMySettings(content);
+}
+
+// ── МОЇ ЗАМОВЛЕННЯ ──────────────────────────────────────────
+const STATUS_LABEL = {new:'🆕 Нове',in_progress:'🔧 В роботі',done:'✅ Виконано',cancelled:'❌ Скасовано'};
+const STATUS_COLOR = {new:'var(--accent)',in_progress:'var(--gold)',done:'var(--green)',cancelled:'var(--red)'};
+
+async function renderMyOrders(container){
+    const orders=await DB.getUserOrders(currentUser.id);
+    if(!orders.length){
+        container.innerHTML=`<div class="profile-empty"><p>У вас ще немає замовлень.</p><button class="form-submit" style="max-width:240px;margin-top:16px" onclick="openOrderModal()">Зробити замовлення</button></div>`;
+        return;
+    }
+    container.innerHTML=[...orders].reverse().map(o=>`
+        <div class="order-card" id="oc-${o.id}">
+            <div class="order-card__head">
+                <div>
+                    <span class="order-card__id">№ ${o.id.slice(-6).toUpperCase()}</span>
+                    <span class="order-card__date">${fmtDateTime(o.createdAt)}</span>
+                </div>
+                <span class="order-card__status" style="color:${STATUS_COLOR[o.status]||'var(--text-muted)'}">
+                    ${STATUS_LABEL[o.status]||o.status}
+                </span>
+            </div>
+            <div class="order-card__body">
+                <div class="order-card__row"><span>Виріб:</span><b>${esc(o.product)}</b></div>
+                <div class="order-card__row"><span>Матеріал:</span><b>${esc(o.material)}</b></div>
+                <div class="order-card__row"><span>Стиль:</span><b>${esc(o.style)}</b></div>
+                ${o.extras?`<div class="order-card__row"><span>Додатково:</span><b>${esc(o.extras)}</b></div>`:''}
+                ${o.notes?`<div class="order-card__row"><span>Нотатки:</span><b>${esc(o.notes)}</b></div>`:''}
+            </div>
+            ${o.status==='new'?`
+            <div class="order-card__actions">
+                <button class="btn-sm warning" onclick="openEditOrderModal('${o.id}')">✎ Редагувати</button>
+                <button class="btn-sm danger"  onclick="doCancelOrder('${o.id}')">✕ Скасувати</button>
+            </div>`:''}
+        </div>
+    `).join('');
+}
+
+async function doCancelOrder(orderId){
+    if(!confirm('Скасувати це замовлення?')) return;
+    const r=await DB.cancelOrder(orderId);
+    if(r.error){ showNotif(r.error,'error'); return; }
+    showNotif('Замовлення скасовано');
+    renderProfileTab('orders');
+}
+
+// ── РЕДАГУВАННЯ ЗАМОВЛЕННЯ ───────────────────────────────────
+let _editingOrderId=null;
+
+function openEditOrderModal(orderId){
+    _editingOrderId=orderId;
+    DB.getUserOrders(currentUser.id).then(orders=>{
+        const o=orders.find(x=>x.id===orderId); if(!o) return;
+        const sel=document.getElementById('editOrderProduct');
+        for(let i=0;i<sel.options.length;i++) if(sel.options[i].text===o.product||sel.options[i].value===o.product){sel.selectedIndex=i;break;}
+        const selM=document.getElementById('editOrderMaterial');
+        for(let i=0;i<selM.options.length;i++) if(selM.options[i].text===o.material){selM.selectedIndex=i;break;}
+        const selS=document.getElementById('editOrderStyle');
+        for(let i=0;i<selS.options.length;i++) if(selS.options[i].text===o.style){selS.selectedIndex=i;break;}
+        document.getElementById('editOrderExtras').value=o.extras||'';
+        document.getElementById('editOrderNotes').value=o.notes||'';
+        document.getElementById('editOrderError').style.display='none';
+        openModal('editOrderModal');
+    });
+}
+
+async function submitEditOrder(){
+    const product=document.getElementById('editOrderProduct').value;
+    const material=document.getElementById('editOrderMaterial').value;
+    const style=document.getElementById('editOrderStyle').value;
+    const extras=document.getElementById('editOrderExtras').value;
+    const notes=document.getElementById('editOrderNotes').value;
+    if(!product||!material||!style){ showNotif("Заповніть всі обов'язкові поля",'error'); return; }
+    const r=await DB.updateOrder(_editingOrderId,{product,material,style,extras,notes});
+    if(r.error){ document.getElementById('editOrderError').textContent=r.error; document.getElementById('editOrderError').style.display='block'; return; }
+    closeModal('editOrderModal');
+    showNotif('Замовлення оновлено!','success');
+    renderProfileTab('orders');
+}
+
+// ── ІСТОРІЯ ПЕРЕГЛЯДІВ ───────────────────────────────────────
+async function renderMyHistory(container){
+    const hist=await DB.getHistory();
+    if(!hist.length){
+        container.innerHTML=`<div class="profile-empty"><p>Ви ще не переглядали жодного виробу.</p></div>`;
+        return;
+    }
+    const cards=hist.map(h=>{
+        const p=h.product;
+        const media=getMedia(p);
+        const src=media.length?media[0].src:PLACEHOLDER;
+        return `<div class="history-card" onclick="trackAndOpenLightbox('${esc(p.id)}')">
+            <div class="history-card__img"><img src="${esc(src)}" alt="${esc(p.name)}" onerror="this.src='${PLACEHOLDER}'"></div>
+            <div class="history-card__info">
+                <div class="history-card__name">${esc(p.name)}</div>
+                ${p.price?`<div class="history-card__price">${Number(p.price).toLocaleString('uk-UA')} грн</div>`:''}
+                <div class="history-card__time">Переглянуто: ${fmtDateTime(h.viewedAt)}</div>
+            </div>
+        </div>`;
+    }).join('');
+    container.innerHTML=`
+        <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+            <button class="btn-sm danger" style="flex:0;min-width:160px" onclick="doClearHistory()">✕ Очистити історію</button>
+        </div>
+        <div class="history-grid">${cards}</div>`;
+}
+
+async function doClearHistory(){
+    if(!confirm('Очистити всю історію переглядів?')) return;
+    await DB.clearHistory();
+    showNotif('Історію очищено');
+    renderProfileTab('history');
+}
+
+// ── НАЛАШТУВАННЯ ПРОФІЛЮ ─────────────────────────────────────
+function renderMySettings(container){
+    container.innerHTML=`
+        <div class="settings-form">
+            <h3 class="settings-section">Особисті дані</h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div class="form-group"><label>Ім'я</label><input id="sName" value="${esc(currentUser.name)}"></div>
+                <div class="form-group"><label>Прізвище</label><input id="sSurname" value="${esc(currentUser.surname||'')}"></div>
+            </div>
+            <div class="form-group"><label>Телефон</label><input id="sPhone" type="tel" value="${esc(currentUser.phone||'')}"></div>
+            <div class="form-group"><label>Email</label><input id="sEmail" type="email" value="${esc(currentUser.email)}" disabled style="opacity:.5;cursor:not-allowed;"></div>
+
+            <h3 class="settings-section" style="margin-top:20px">Змінити пароль</h3>
+            <div class="form-group"><label>Новий пароль (залиш порожнім, щоб не змінювати)</label><input id="sPass" type="password" placeholder="••••••••"></div>
+            <div class="form-group"><label>Підтвердити пароль</label><input id="sPass2" type="password" placeholder="••••••••"></div>
+
+            <div class="form-error" id="settingsError"></div>
+            <button class="form-submit" onclick="saveSettings()">Зберегти зміни</button>
+        </div>`;
+}
+
+async function saveSettings(){
+    const name=document.getElementById('sName').value.trim();
+    const surname=document.getElementById('sSurname').value.trim();
+    const phone=document.getElementById('sPhone').value.trim();
+    const pass=document.getElementById('sPass').value;
+    const pass2=document.getElementById('sPass2').value;
+    const errEl=document.getElementById('settingsError');
+    errEl.style.display='none';
+    if(!name||!surname){ errEl.textContent="Ім'я та прізвище обов'язкові"; errEl.style.display='block'; return; }
+    if(pass&&pass.length<6){ errEl.textContent='Пароль мінімум 6 символів'; errEl.style.display='block'; return; }
+    if(pass&&pass!==pass2){ errEl.textContent='Паролі не збігаються'; errEl.style.display='block'; return; }
+    const update={name,surname,phone};
+    if(pass) update.password=pass;
+    const r=await DB.updateProfile(currentUser.id,update);
+    if(r.error){ errEl.textContent=r.error; errEl.style.display='block'; return; }
+    currentUser={...currentUser,...r.user};
+    sessionStorage.setItem('cj_current',JSON.stringify(currentUser));
+    renderAuthArea();
+    showNotif('Профіль оновлено!','success');
+    document.getElementById('profileName').textContent=`${currentUser.name} ${currentUser.surname}`;
+    document.getElementById('profilePhone').textContent=currentUser.phone||'—';
+}
+
+// ════════════════════════════════════════════════════════════
+//  CHAT (user ↔ admin)
+// ════════════════════════════════════════════════════════════
+async function openChatModal(){
+    if(!currentUser){ showNotif('Потрібно увійти','error'); openAuthModal(); return; }
+    openModal('chatModal');
+    await renderChatMessages();
+    // Позначаємо повідомлення від адміна як прочитані
+    if(!USE_SERVER) await DB.markMessagesRead(currentUser.id);
+    updateChatBadge();
+}
+
+async function renderChatMessages(){
+    const wrap=document.getElementById('chatMessages');
+    const msgs=await DB.getMessages(currentUser.id);
+    if(!msgs.length){
+        wrap.innerHTML=`<div style="text-align:center;padding:30px;color:rgba(255,255,255,.3);font-size:13px;">
+            Надішліть повідомлення — адміністратор відповість якнайшвидше.
+        </div>`;
+        return;
+    }
+    wrap.innerHTML=msgs.map(m=>`
+        <div class="chat-msg ${m.fromAdmin?'chat-msg--admin':'chat-msg--user'}">
+            ${esc(m.text)}
+            <div class="chat-msg__meta">${m.fromAdmin?'Адміністратор · ':''} ${fmtDateTime(m.createdAt)}</div>
+        </div>`).join('');
+    wrap.scrollTop=wrap.scrollHeight;
+}
+
+async function sendChatMessage(){
+    const inp=document.getElementById('chatInput');
+    const text=inp.value.trim();
+    if(!text) return;
+    inp.value='';
+    await DB.sendMessage({userId:currentUser.id,userName:currentUser.name+' '+currentUser.surname,text,fromAdmin:false});
+    await renderChatMessages();
+}
+
+async function updateChatBadge(){
+    if(!currentUser||currentUser.role==='admin') return;
+    const msgs=await DB.getMessages(currentUser.id);
+    const unread=msgs.filter(m=>m.fromAdmin&&!m.read).length;
+    const badge=document.getElementById('chatFabBadge');
+    if(badge){ badge.style.display=unread>0?'flex':'none'; badge.textContent=unread; }
+}
+
+// ── Адмін: перегляд та відповідь ─────────────────────────────
+async function openAdminMessagesModal(){
+    openModal('adminMsgModal');
+    await renderAdminMessagesList();
+}
+
+async function renderAdminMessagesList(){
+    const wrap=document.getElementById('adminMsgWrap');
+    wrap.innerHTML='<p style="padding:12px;color:var(--text-muted);font-size:13px">Завантаження...</p>';
+    const allMsgs=await DB.getAllMessages();
+    if(!allMsgs.length){
+        wrap.innerHTML='<p style="padding:16px;color:var(--text-muted);font-size:13px">Повідомлень немає.</p>';
+        return;
+    }
+    // Групуємо по userId
+    const byUser={};
+    allMsgs.forEach(m=>{ if(!byUser[m.userId]) byUser[m.userId]={msgs:[],userName:m.userName,userId:m.userId}; byUser[m.userId].msgs.push(m); });
+    const items=Object.values(byUser).map(u=>{
+        const last=u.msgs[u.msgs.length-1];
+        const unread=u.msgs.filter(m=>!m.fromAdmin&&!m.read).length;
+        return `<div class="msg-user-item" onclick="adminOpenThread('${esc(u.userId)}','${esc(u.userName)}')">
+            <div>
+                <div class="msg-user-item__name">${esc(u.userName)}</div>
+                <div class="msg-user-item__preview">${esc(last.text.slice(0,60))}${last.text.length>60?'…':''}</div>
+            </div>
+            ${unread>0?`<span class="msg-user-item__badge">${unread} нових</span>`:''}
+        </div>`;
+    }).join('');
+    wrap.innerHTML=`<div class="msg-user-list">${items}</div>`;
+
+    // Оновлюємо бейдж на кнопці
+    const totalUnread=allMsgs.filter(m=>!m.fromAdmin&&!m.read).length;
+    const badge=document.getElementById('adminMsgBadge');
+    if(badge){ badge.style.display=totalUnread>0?'inline-flex':'none'; badge.textContent=totalUnread; }
+}
+
+let _adminThreadUserId=null;
+async function adminOpenThread(userId,userName){
+    _adminThreadUserId=userId;
+    const wrap=document.getElementById('adminMsgWrap');
+    const msgs=await DB.getMessages(userId);
+    const msgsHtml=msgs.map(m=>`
+        <div class="chat-msg ${m.fromAdmin?'chat-msg--user':'chat-msg--admin'}">
+            ${esc(m.text)}
+            <div class="chat-msg__meta">${m.fromAdmin?'Адміністратор':esc(m.userName)} · ${fmtDateTime(m.createdAt)}</div>
+        </div>`).join('');
+
+    wrap.innerHTML=`
+        <button class="msg-back" onclick="renderAdminMessagesList()">← Назад до списку</button>
+        <div style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:10px">Переписка з: ${esc(userName)}</div>
+        <div class="msg-thread">${msgsHtml||'<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:12px">Немає повідомлень</div>'}</div>
+        <div class="msg-reply-row">
+            <input class="msg-reply-input" type="text" id="adminReplyInput" placeholder="Написати відповідь..." onkeydown="if(event.key==='Enter')adminSendReply()">
+            <button class="chat-send" onclick="adminSendReply()">Відповісти</button>
+        </div>`;
+    const thread=wrap.querySelector('.msg-thread'); if(thread) thread.scrollTop=thread.scrollHeight;
+}
+
+async function adminSendReply(){
+    const inp=document.getElementById('adminReplyInput'); if(!inp) return;
+    const text=inp.value.trim(); if(!text) return;
+    inp.value='';
+    await DB.sendMessage({userId:_adminThreadUserId,userName:'Адміністратор',text,fromAdmin:true});
+    await adminOpenThread(_adminThreadUserId,'');
+    showNotif('Відповідь надіслано','success');
+}
+
+// ════════════════════════════════════════════════════════════
+//  PRODUCT CRUD (admin)
+// ════════════════════════════════════════════════════════════
+let _adminMedia=[];
+let _cachedProducts=[];
+
+function openAddProductModal(){
+    document.getElementById('addProductTitle').textContent='Додати виріб';
+    document.getElementById('saveProductBtn').textContent='+ Зберегти виріб';
+    document.getElementById('editProductId').value='';
+    ['addName','addDesc','addMaterial','addPrice','addMediaUrl'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('addCat').value='rings';
+    _adminMedia=[]; renderMediaPreview(); openModal('addProductModal');
+}
+
+async function openEditModal(id){
+    _cachedProducts=await DB.getProducts();
+    const p=_cachedProducts.find(x=>x.id===id);
+    if(!p){ showNotif('Виріб не знайдено','error'); return; }
+    document.getElementById('addProductTitle').textContent='Редагувати виріб';
+    document.getElementById('saveProductBtn').textContent='✓ Зберегти зміни';
+    document.getElementById('editProductId').value=id;
+    document.getElementById('addCat').value=p.category||'rings';
+    document.getElementById('addName').value=p.name||'';
+    document.getElementById('addDesc').value=p.desc||'';
+    document.getElementById('addMaterial').value=p.material||'';
+    document.getElementById('addPrice').value=p.price||'';
+    document.getElementById('addMediaUrl').value='';
+    _adminMedia=getMedia(p).map(m=>({...m}));
+    renderMediaPreview(); openModal('addProductModal');
+}
+
+function handleMediaFiles(input){
+    Array.from(input.files).forEach(file=>{
+        const type=file.type.startsWith('video')?'video':'image';
+        const r=new FileReader();
+        r.onload=e=>{ _adminMedia.push({type,src:e.target.result}); renderMediaPreview(); };
+        r.readAsDataURL(file);
+    }); input.value='';
+}
+
+function addMediaUrl(){
+    const input=document.getElementById('addMediaUrl');
+    const url=input.value.trim(); if(!url) return;
+    const isVideo=/\.(mp4|mov|webm|ogg)(\?|$)/i.test(url);
+    _adminMedia.push({type:isVideo?'video':'image',src:url});
+    input.value=''; renderMediaPreview();
+}
+
+function removeMedia(idx){ _adminMedia.splice(idx,1); renderMediaPreview(); }
+
+function renderMediaPreview(){
+    const list=document.getElementById('mediaPreviewList');
+    if(!_adminMedia.length){ list.innerHTML=''; return; }
+    list.innerHTML=_adminMedia.map((m,i)=>`
+        <div class="media-thumb">
+            ${m.type==='video'?`<video src="${esc(m.src)}" muted preload="metadata"></video><span class="media-thumb__type">відео</span>`:`<img src="${esc(m.src)}">`}
+            <button class="media-thumb__remove" onclick="removeMedia(${i})">✕</button>
+        </div>`).join('');
+}
+
+async function adminSaveProduct(){
+    const id=document.getElementById('editProductId').value;
+    const category=document.getElementById('addCat').value;
+    const name=document.getElementById('addName').value.trim();
+    const desc=document.getElementById('addDesc').value.trim();
+    const material=document.getElementById('addMaterial').value.trim();
+    const price=document.getElementById('addPrice').value;
+    if(!name){ showNotif('Введіть назву виробу','error'); return; }
+    const firstImg=_adminMedia.find(m=>m.type==='image');
+    const data={category,name,desc,material,price:price||null,img:firstImg?firstImg.src:'',media:_adminMedia};
+    const r=id?await DB.updateProduct(id,data):await DB.addProduct(data);
+    if(r.error){ showNotif(r.error,'error'); return; }
+    showNotif(id?'Зміни збережено!':'Виріб додано!','success');
+    _lbProducts=[]; closeModal('addProductModal'); refreshAll();
+}
+
+async function deleteProduct(id){
+    if(!confirm('Видалити цей виріб?')) return;
+    const r=await DB.deleteProduct(id);
+    if(r.error){ showNotif(r.error,'error'); return; }
+    showNotif('Виріб видалено','success'); _lbProducts=[]; refreshAll();
+}
+
+function refreshAll(){ renderHomeCatalog(); if(currentCategory) renderCategoryProducts(currentCategory); }
+function exportDB(){ if(USE_SERVER){ showNotif('Недоступно в серверному режимі','error'); return; } DB.exportJSON(); showNotif('Базу даних експортовано!','success'); }
+
+// ════════════════════════════════════════════════════════════
+//  ADMIN PANEL
+// ════════════════════════════════════════════════════════════
+async function openUsersModal(){
+    const wrap=document.getElementById('usersTableWrap');
+    wrap.innerHTML='<p style="padding:16px;color:var(--text-muted);font-size:13px">Завантаження...</p>';
+    openModal('usersModal');
+    const [users,orders]=await Promise.all([DB.getUsers(),DB.getOrders()]);
+    let html='';
+
+    html+=`<div class="admin-panel-tabs">
+        <button class="admin-panel-tab active" onclick="adminSwitchTab('users',this)">👥 Користувачі (${users.length})</button>
+        <button class="admin-panel-tab" onclick="adminSwitchTab('orders',this)">📦 Замовлення (${orders.length})</button>
+    </div>`;
+
+    html+=`<div id="adminTabUsers">`;
+    if(!users.length){ html+='<p style="padding:16px;color:var(--text-muted);font-size:13px">Немає користувачів.</p>'; }
+    else {
+        html+=`<table class="users-table"><thead><tr><th>Ім'я</th><th>Email</th><th>Телефон</th><th>Замовл.</th><th>Переглядів</th><th>Реєстр.</th></tr></thead><tbody>`;
+        html+=users.map(u=>{
+            const cnt=orders.filter(o=>o.userId===u.id).length;
+            const hist=JSON.parse(localStorage.getItem(`cj_history_${u.id}`)||'[]').length;
+            return `<tr><td>${esc(u.name)} ${esc(u.surname)}</td><td>${esc(u.email)}</td><td>${esc(u.phone)||'—'}</td><td>${cnt}</td><td>${hist}</td><td>${fmtDate(u.createdAt)}</td></tr>`;
+        }).join('');
+        html+=`</tbody></table>`;
+    }
+    html+=`</div>`;
+
+    const statusLabel={new:'🆕 Нове',in_progress:'🔧 В роботі',done:'✅ Виконано',cancelled:'❌ Скасовано'};
+    html+=`<div id="adminTabOrders" style="display:none">`;
+    if(!orders.length){ html+='<p style="padding:16px;color:var(--text-muted);font-size:13px">Замовлень немає.</p>'; }
+    else {
+        html+=`<table class="users-table"><thead><tr><th>ID</th><th>Клієнт</th><th>Виріб</th><th>Матеріал</th><th>Стиль</th><th>Статус</th><th>Дата</th><th>Дії</th></tr></thead><tbody>`;
+        html+=[...orders].reverse().map(o=>`<tr>
+            <td style="font-size:10px;opacity:.6">${o.id.slice(-6).toUpperCase()}</td>
+            <td>${esc(o.userName)}<br><span style="font-size:10px;opacity:.6">${esc(o.userEmail)}</span></td>
+            <td>${esc(o.product)}</td><td>${esc(o.material)}</td><td>${esc(o.style)}</td>
+            <td><select onchange="adminChangeStatus('${o.id}',this.value)" style="background:var(--bg-input);color:var(--text-primary);border:1px solid var(--border);padding:4px;font-size:11px;">
+                ${['new','in_progress','done','cancelled'].map(s=>`<option value="${s}" ${o.status===s?'selected':''}>${statusLabel[s]}</option>`).join('')}
+            </select></td>
+            <td style="font-size:11px">${fmtDate(o.createdAt)}</td>
+            <td>${o.notes?`<span title="${esc(o.notes)}" style="cursor:help;font-size:16px">💬</span>`:''}</td>
+        </tr>`).join('');
+        html+=`</tbody></table>`;
+    }
+    html+=`</div>`;
+
+    wrap.innerHTML=html;
+}
+
+function adminSwitchTab(tab,btn){
+    document.querySelectorAll('.admin-panel-tab').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('adminTabUsers').style.display=tab==='users'?'':'none';
+    document.getElementById('adminTabOrders').style.display=tab==='orders'?'':'none';
+}
+
+async function adminChangeStatus(orderId,newStatus){
+    if(USE_SERVER){
+        await fetch(`${API_URL}/orders/${orderId}/status`,{method:'PATCH',headers:DB._headers(),body:JSON.stringify({status:newStatus})});
+    } else {
+        const orders=JSON.parse(localStorage.getItem('cj_orders')||'[]');
+        const i=orders.findIndex(o=>o.id===orderId); if(i>=0){ orders[i].status=newStatus; localStorage.setItem('cj_orders',JSON.stringify(orders)); }
+    }
+    showNotif('Статус оновлено','success');
+}
+
+// ════════════════════════════════════════════════════════════
+//  AUTH UI
+// ════════════════════════════════════════════════════════════
+function renderAuthArea(){
+    const area=document.getElementById('authArea');
+    const adminBar=document.getElementById('adminBar');
+    const chatFab=document.getElementById('chatFab');
+    if(!currentUser){
+        area.innerHTML=`<button class="nav__btn" onclick="openAuthModal()">Увійти</button>`;
+        adminBar.style.display='none';
+        if(chatFab) chatFab.style.display='none';
+    } else {
+        const label=currentUser.role==='admin'?'Адмін':'Користувач';
+        area.innerHTML=`
+            <button class="nav__btn" onclick="showPage('profile')" style="margin-right:6px">👤 ${esc(currentUser.name)}</button>
+            <div class="user-badge" onclick="doLogout()" title="Вийти">
+                <span class="role-tag ${currentUser.role}">${label}</span>
+                <span style="font-size:10px;opacity:.5;">Вийти</span>
+            </div>`;
+        adminBar.style.display=currentUser.role==='admin'?'flex':'none';
+        // Показуємо chat FAB тільки для звичайних користувачів
+        if(chatFab) chatFab.style.display=currentUser.role!=='admin'?'flex':'none';
+        if(currentUser.role!=='admin') updateChatBadge();
+        if(currentUser.role==='admin') updateAdminMsgBadge();
+    }
+}
+
+async function updateAdminMsgBadge(){
+    const allMsgs=await DB.getAllMessages();
+    const unread=allMsgs.filter(m=>!m.fromAdmin&&!m.read).length;
+    const badge=document.getElementById('adminMsgBadge');
+    if(badge){ badge.style.display=unread>0?'inline-flex':'none'; badge.textContent=unread; }
+}
+
+// ════════════════════════════════════════════════════════════
+//  MODALS
+// ════════════════════════════════════════════════════════════
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+document.addEventListener('click',e=>{ if(e.target.classList.contains('modal-overlay')) e.target.classList.remove('open'); });
+function openAuthModal(){ openModal('authModal'); switchTab('login'); }
+
+// ════════════════════════════════════════════════════════════
+//  AUTH LOGIC
+// ════════════════════════════════════════════════════════════
+function switchTab(tab){
+    document.getElementById('loginForm').style.display=tab==='login'?'block':'none';
+    document.getElementById('registerForm').style.display=tab==='register'?'block':'none';
+    document.getElementById('tabLogin').classList.toggle('active',tab==='login');
+    document.getElementById('tabRegister').classList.toggle('active',tab==='register');
+    document.getElementById('authTitle').textContent=tab==='login'?'Увійти':'Реєстрація';
+    document.getElementById('authSubtitle').textContent=tab==='login'?'Введіть свої дані':'Створіть обліковий запис';
+    document.getElementById('loginError').style.display='none';
+    document.getElementById('registerError').style.display='none';
+    document.getElementById('registerSuccess').style.display='none';
+}
+
+async function doLogin(){
+    const email=document.getElementById('loginEmail').value.trim();
+    const pass=document.getElementById('loginPassword').value;
+    const r=await DB.login(email,pass);
+    if(r.error){ document.getElementById('loginError').style.display='block'; return; }
+    currentUser=r.user; sessionStorage.setItem('cj_current',JSON.stringify(currentUser));
+    closeModal('authModal'); renderAuthArea(); renderHomeCatalog();
+    showNotif(`Ласкаво просимо, ${currentUser.name}!`,'success');
+}
+
+async function doRegister(){
+    const name=document.getElementById('regName').value.trim();
+    const surname=document.getElementById('regSurname').value.trim();
+    const phone=document.getElementById('regPhone').value.trim();
+    const email=document.getElementById('regEmail').value.trim();
+    const password=document.getElementById('regPassword').value;
+    const errEl=document.getElementById('registerError');
+    errEl.style.display='none';
+    if(!name||!surname||!phone||!email||!password){ errEl.textContent='Заповніть всі поля'; errEl.style.display='block'; return; }
+    if(password.length<6){ errEl.textContent='Пароль мінімум 6 символів'; errEl.style.display='block'; return; }
+    const r=await DB.register({name,surname,phone,email:email.toLowerCase(),password});
+    if(r.error){ errEl.textContent=r.error; errEl.style.display='block'; return; }
+    document.getElementById('registerSuccess').style.display='block';
+    setTimeout(()=>switchTab('login'),1600);
+}
+
+function doLogout(){
+    if(!confirm('Вийти з облікового запису?')) return;
+    currentUser=null; sessionStorage.removeItem('cj_current');
+    renderAuthArea(); renderHomeCatalog(); showNotif('Ви вийшли з облікового запису');
+    showPage('home');
+}
+
+// ════════════════════════════════════════════════════════════
+//  ORDER
+// ════════════════════════════════════════════════════════════
+function openOrderModal(productName){
+    if(!currentUser){ showNotif('Для замовлення потрібно увійти','error'); openAuthModal(); return; }
+    const sel=document.getElementById('orderProduct');
+    if(productName){
+        let found=false;
+        for(let i=0;i<sel.options.length;i++){ if(sel.options[i].value===productName||sel.options[i].text===productName){sel.selectedIndex=i;found=true;break;} }
+        if(!found){ const o=document.createElement('option'); o.value=o.text=productName; sel.appendChild(o); sel.value=productName; }
+    }
+    document.getElementById('orderSuccess').style.display='none';
+    document.getElementById('orderFilesPreview').innerHTML='';
+    openModal('orderModal');
+}
+
+function previewFiles(input){
+    const preview=document.getElementById('orderFilesPreview'); preview.innerHTML='';
+    Array.from(input.files).forEach(file=>{ const r=new FileReader(); r.onload=e=>{ const img=document.createElement('img'); img.src=e.target.result; preview.appendChild(img); }; r.readAsDataURL(file); });
+}
+
+async function submitOrder(){
+    const product=document.getElementById('orderProduct').value;
+    const material=document.getElementById('orderMaterial').value;
+    const style=document.getElementById('orderStyle').value;
+    const extras=document.getElementById('orderExtras').value;
+    const notes=document.getElementById('orderNotes').value;
+    if(!product||!material||!style){ showNotif('Оберіть виріб, матеріал і стиль','error'); return; }
+    const r=await DB.addOrder({userId:currentUser.id,userName:currentUser.name+' '+currentUser.surname,userEmail:currentUser.email,userPhone:currentUser.phone||'',product,material,style,extras,notes});
+    if(r.error){ showNotif(r.error,'error'); return; }
+    document.getElementById('orderSuccess').style.display='block';
+    setTimeout(()=>closeModal('orderModal'),3000);
+}
+
+// ════════════════════════════════════════════════════════════
+//  NOTIFICATIONS
+// ════════════════════════════════════════════════════════════
+function showNotif(msg,type){
+    const n=document.getElementById('notif'); n.textContent=msg;
+    n.className='notif'+(type?' '+type:''); void n.offsetWidth; n.classList.add('show');
+    setTimeout(()=>n.classList.remove('show'),3000);
+}
+
+// ════════════════════════════════════════════════════════════
+//  THEME
+// ════════════════════════════════════════════════════════════
+function applyTheme(t){
+    document.documentElement.setAttribute('data-theme',t);
+    const btn=document.getElementById('themeBtn'); if(btn) btn.textContent=t==='dark'?'🌙':'☀️';
+    localStorage.setItem('cj_theme',t);
+}
+function toggleTheme(){ applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark'); }
+
+// ════════════════════════════════════════════════════════════
+//  BOOT
+// ════════════════════════════════════════════════════════════
+(function(){
+    const saved=localStorage.getItem('cj_theme');
+    applyTheme(saved||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'));
+})();
+window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',e=>{ if(!localStorage.getItem('cj_theme')) applyTheme(e.matches?'dark':'light'); });
+
+renderAuthArea();
+renderHomeCatalog();
+history.replaceState({page:'home',category:null},'','#home');
